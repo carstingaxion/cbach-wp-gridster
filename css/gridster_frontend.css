@@ -1,0 +1,10 @@
+ul.gridster {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+    ul.gridster li {
+        margin: 0;
+        padding: 0;
+        position: absolute;
+    }

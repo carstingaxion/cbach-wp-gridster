@@ -1,0 +1,344 @@
+/*********************************************************************************************************************************************
+ *  default UI 
+ ********************************************************************************************************************************************/
+
+.gridster li .meta-label span.delete-post,  
+.gridster li .meta-label span.move-handle,
+#adminmenu #menu-posts-gridster div.wp-menu-image,
+#icon-edit.icon32-posts-gridster,
+.gridster_edit:before,
+.gridster_edit_area:before {
+    background-image: url('../images/gridster_sprite.png');
+    background-repeat: no-repeat;
+}
+/******************************************************************************************************************
+ *  ICONS (overwritten from WP defaults) 
+ ******************************************************************************************************************/
+ 
+#adminmenu #menu-posts-gridster div.wp-menu-image {
+    background-position: 7px -42px;
+}
+#adminmenu #menu-posts-gridster:hover div.wp-menu-image, 
+#adminmenu #menu-posts-gridster.wp-has-current-submenu div.wp-menu-image {
+    background-position: 7px -71px;
+}
+#icon-edit.icon32-posts-gridster {
+    background-position: 0 -114px;
+}
+
+/*********************************************************************************************************************************************
+ *  CPT Gridster edit.php 
+ ********************************************************************************************************************************************/
+.gridster_shortcode-in-list-table {
+    min-width: 50%;
+    font-family: Consolas, monaco, monospace;
+    border: none; 
+} 
+ 
+ 
+/*********************************************************************************************************************************************
+ *  CPT Gridster post.php - METABOX common UI
+ ********************************************************************************************************************************************/
+#gridster_workbench_metabox {
+    background: none;
+    border: none;
+    margin-top: -2em;
+}
+#gridster_workbench_metabox:after {
+    content: '';
+    clear: both;
+    display: block;
+}
+
+
+
+/*********************************************************************************************************************************************
+ *  CPT Gridster post.php - METABOX left column with widget-blocks of posts
+ ********************************************************************************************************************************************/
+    #gridster_workbench_metabox > .handlediv, 
+    #gridster_workbench_metabox > h3 {
+        display: none;
+    }
+    
+    #gridster_workbench_metabox > .inside {
+        padding: 0;
+        margin: 0;
+    }     
+
+
+    #gridster_content_blocks {
+        width: 280px;
+        float: left;
+        position: relative;
+        z-index: 1;
+    }
+        .gridster_widget-block {
+            margin-bottom: 1em;
+            border: 1px solid #DFDFDF;
+            -webkit-border-radius: 3px;
+                    border-radius: 3px;
+            -webkit-background-clip: padding-box; 
+                    background-clip: padding-box;
+            -webkit-box-shadow: inset 0px 1px 0px 0px #ffffff;
+                    box-shadow: inset 0px 1px 0px 0px #ffffff;
+        } 
+        .js .gridster_widget-block h3 {
+            cursor: pointer;
+        }
+        #gridster_workbench_metabox:hover .gridster_widget-block .handlediv {
+            background: none;
+        }
+        .js #gridster_workbench_metabox .gridster_widget-block:hover .handlediv {
+            background: url('/wp-admin/images/arrows.png') no-repeat scroll 6px 7px transparent;
+        }
+        .js #gridster_workbench_metabox .gridster_widget-block.trigger_active .handlediv {
+            background: url('/wp-admin/images/arrows.png') no-repeat scroll 6px -29px transparent;
+        }
+        #gridster_workbench_metabox .gridster_widget-block .inside {
+            margin: 0;
+            display: none;
+            padding: 0;
+        }
+            .gridster_widget-block .inside li {
+                clear: both;
+                margin: 0;
+                padding: 3px 10px;
+            }
+            .gridster_widget-block .inside li:hover {
+                cursor: move;
+                background-color: #F8F8F8; 
+            }
+                .gridster_widget-block .inside li span {
+                    display: inline-block;
+                    max-width: 82%;
+                    color: #21759B;
+                }                                    
+                .gridster_widget-block .inside li:hover span {
+                    color: #d54e21;
+                }
+                .gridster_widget-block .inside li abbr {
+                    border: none;
+                } 
+            .gridster_widget-block .inside li.ui-draggable-dragging {
+                z-index: 999!important;
+                display: list-item;
+                padding: 3px 6px;
+                width: 70%;
+                background-color: #FFFFE0!important;
+                border: 1px dotted #E6DB55;
+                -webkit-transform: scale(1.5); 
+                   -moz-transform: scale(1.5); 
+                    -ms-transform: scale(1.5); 
+                     -o-transform: scale(1.5); 
+                        transform: scale(1.5); 
+            }
+                .gridster_widget-block .inside li.ui-draggable-dragging > span { 
+                    max-width: 100%;
+                }           
+                .gridster_widget-block .inside li.ui-draggable-dragging small.howto {
+                    display: none;
+                }                        
+           
+
+
+/*********************************************************************************************************************************************
+ *  CPT Gridster post.php - METABOX right column with gridster.js workbench
+ ********************************************************************************************************************************************/
+    #gridster_workbench_wrap {
+        width: 100%;
+        margin-left: -280px;
+        float: left;
+        position: relative;
+    } 
+        .js #gridster_workbench  {
+            overflow-x: hidden;
+            min-height: 400px;
+            border: 1px dashed #ccc;
+            -webkit-border-radius: 3px;
+                    border-radius: 3px;
+            -webkit-background-clip: padding-box; 
+                    background-clip: padding-box;
+            background: #F8F8F8;
+            -webkit-box-shadow: inset 1px 1px 5px #ccc;    
+               -moz-box-shadow: inset 1px 1px 5px #ccc; 
+                    box-shadow: inset 1px 1px 5px #ccc;                
+        }
+        #gridster_workbench_wrap noscript div {
+            text-align: center;
+            min-height: 200px;
+            padding: 100px 0;
+            margin: 0;
+            font-size: 1.5em;
+        }
+        #gridster_load-wrap {
+            height: 100%;
+            left: 0;
+            position: absolute;   
+            top: 0;
+            width: 100%;
+            display: none;
+            z-index: 1000;                                        
+        }
+            #gridster_loader {        
+                background-color: rgba(228, 228, 228, 0.85);
+                -webkit-border-radius: 3px;
+                        border-radius: 3px;
+                -webkit-background-clip: padding-box; 
+                        background-clip: padding-box;            
+                cursor: not-allowed;
+                padding: 0 30px;
+                font-size: 1.5em;
+                height: 100%;
+                text-align: center;
+                text-shadow: 1px 1px 0 #FFF, 0 0 35px #000;
+                border: 1px dashed #CCCCCC;
+            }
+            #gridster_loader.error {        
+                background-color: rgba(255, 0, 0, 0.85);
+                text-shadow: 1px 1px 0 #000, 0 0 35px #f00;
+                border-color: #f00;
+                margin-top: 0;
+            }            
+                #gridster_loader p {
+                    padding: 180px 0;
+                    margin: 0;
+                } 
+                #gridster_loader.error p{
+                    color: #fff;                
+                }                       
+                    #gridster_load-wrap p img {
+                        vertical-align: middle;
+                        margin-right: 5px;
+                    }        
+
+        #gridster_workbench,
+        #gridster_workbench_wrap noscript div,
+        #gridster_loader  {
+            margin-left: 300px;
+        }
+        
+        .gridster .content_width-border {
+            border-left: 2px dotted #FFCFC9;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            ymargin-left: -2px;
+            padding-left: 2px;
+            cursor: help;        
+        }
+
+
+/*********************************************************************************************************************************************
+ *  CPT Gridster post.php - METABOX right column with gridster.js widgets
+ ********************************************************************************************************************************************/
+        .gridster {
+        
+        }
+            .gridster li {
+                margin: 0;
+                background-color: #ECECEC;
+                outline: 1px dotted grey; 
+                overflow: hidden; 
+            }
+            .gridster li.ui-resizable-resizing {
+                z-index: 9999999 !important;
+            }
+            .gridster li.isUpdated {
+                background: #ECECEC url('/wp-admin/images/wpspin_light.gif') 50% no-repeat;
+            }        
+            .gridster li.isUpdated > * {
+                opacity: .3;
+            }
+                .gridster li .admin-html-holder a {
+                    text-decoration: none!important;
+                    outline: none!important;
+                }
+/******************************************************************************
+ *  CPT Gridster post.php - METABOX right column with gridster.js widgets -> METALABELS
+/******************************************************************************/
+	
+        .gridster li .meta-label {
+            padding: 5px 5px 5px 10px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            z-index:10;
+            background: whitesmoke;
+            border-bottom-left-radius: 6px;
+            -moz-box-shadow:-1px 1px 3px #333; 
+            -webkit-box-shadow: -1px 1px 3px #333; 
+            box-shadow: -1px 1px 3px #333; 
+            -moz-background-clip: padding; -webkit-background-clip: padding-box; background-clip: padding-box; 
+            display: none;                       
+        }
+        .gridster li:hover .meta-label {   
+             display: block; 
+        }        
+             
+            .gridster li .meta-label label,
+            .gridster li .meta-label span {
+                width: 18px;
+                display: inline-block;
+                height: 18px;
+                margin-right: 4px;
+                cursor: pointer;
+                vertical-align: top;
+                opacity: .5;
+            }
+            .gridster li .meta-label label:hover,
+            .gridster li .meta-label span:hover {
+                opacity: 1;
+            }            
+            .gridster li .meta-label span.move-handle {
+                background-position: 0 0;
+            } 
+            .gridster li .meta-label span.delete-post {
+                background-position: 0 -22px;                
+            }  
+
+/******************************************************************************
+ * JEDITABLE ELEMENTS
+/******************************************************************************/
+.gridster_edit,
+.gridster_edit_area {
+    position: relative;
+    padding: 2px 20px;
+    min-height: 1em;    
+}
+.gridster_edit:before,
+.gridster_edit_area:before {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    content: '';
+    width: 16px;
+    height: 16px;
+    display: block;
+    background-position: 0 -164px;    
+}
+.gridster_edit:hover,
+.gridster_edit_area:hover {
+    xtext-shadow: 5px 5px 15px #E6DB55, -5px -5px 15px #E6DB55;
+    background-color: rgba(255, 255, 224, .7);
+    cursor: text;
+}
+    .gridster_edit form input,
+    .gridster_edit_area form textarea {
+        line-height: 1em;
+        margin: 0;
+        max-width: 95%;
+        padding: 2px 1px;
+        min-height: 1em;
+        resize-x: none;
+    }
+
+
+
+/******************************************************************************
+ * HELPER
+/******************************************************************************/
+.ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
+
+
+
+
