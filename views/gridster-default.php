@@ -5,11 +5,7 @@
         </div>
     <?php endif; ?>
     <h1 class="gridster_edit entry-title"><?php the_title(); ?></h1>
-    <p class="gridster_edit_area entry-summary">
+    <p class="gridster_edit-area entry-summary">
         <?php echo get_the_excerpt( ); ?>
-    </p> 
-    <?php 
-        echo wp_trim_words( get_the_content(), 5, '' ); 
-        echo get_the_content();    
-    ?>       
+    </p>      
 </a>
