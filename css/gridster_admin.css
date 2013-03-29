@@ -50,8 +50,43 @@
     display: block;
 }
 
+/*********************************************************************************************************************************************
+ *  CPT Gridster post.php - METABOX 1-column layout
+ ********************************************************************************************************************************************/
 
+    #gridster_workbench_metabox.one-column #gridster_content_blocks {
+        width: 100%;
+    }
+        #gridster_workbench_metabox.one-column #gridster_content_blocks > div {
+            width: 48.5%;
+            float: left;
+        }
+        #gridster_workbench_metabox.one-column #gridster_content_blocks > div:nth-child(even) {
+            margin-left: 3%;
+        } 
+            #gridster_workbench_metabox.one-column .gridster_widget-block .inside li span {
+                max-width: 74%;
+            }            
+    #gridster_workbench_metabox.one-column #gridster_workbench_wrap {
+        margin-left: -280px;
+        margin-bottom: 20px;
+    } 
 
+/*********************************************************************************************************************************************
+ *  CPT Gridster post.php - METABOX 2-columns layout
+ ********************************************************************************************************************************************/
+
+    #gridster_workbench_metabox.two-columns #gridster_content_blocks {
+        width: 280px;
+    }
+    #gridster_workbench_metabox.two-columns #gridster_workbench_wrap {
+        margin-left: -280px;
+    } 
+        #gridster_workbench_metabox.two-columns #gridster_workbench,
+        #gridster_workbench_metabox.two-columns #gridster_workbench_wrap noscript div,
+        #gridster_workbench_metabox.two-columns #gridster_loader  {
+            margin-left: 300px;
+        }
 /*********************************************************************************************************************************************
  *  CPT Gridster post.php - METABOX left column with widget-blocks of posts
  ********************************************************************************************************************************************/
@@ -65,9 +100,7 @@
         margin: 0;
     }     
 
-
     #gridster_content_blocks {
-        width: 280px;
         float: left;
         position: relative;
         z-index: 1;
@@ -146,8 +179,7 @@
  ********************************************************************************************************************************************/
     #gridster_workbench_wrap {
         width: 100%;
-        margin-left: -280px;
-        float: left;
+        float: right;
         position: relative;
     } 
         .js #gridster_workbench  {
@@ -169,6 +201,7 @@
             padding: 100px 0;
             margin: 0;
             font-size: 1.5em;
+            line-height: 1.25em;
         }
         #gridster_load-wrap {
             height: 100%;
@@ -214,7 +247,7 @@
         #gridster_workbench,
         #gridster_workbench_wrap noscript div,
         #gridster_loader  {
-            margin-left: 300px;
+
         }
         
         .gridster .content_width-border {
@@ -222,7 +255,6 @@
             height: 100%;
             position: absolute;
             top: 0;
-            ymargin-left: -2px;
             padding-left: 2px;
             cursor: help;        
         }
@@ -314,11 +346,10 @@
     width: 16px;
     height: 16px;
     display: block;
-    background-position: 0 -164px;    
+    background-position: 0 -164px;
 }
 .gridster_edit:hover,
 .gridster_edit_area:hover {
-    xtext-shadow: 5px 5px 15px #E6DB55, -5px -5px 15px #E6DB55;
     background-color: rgba(255, 255, 224, .7);
     cursor: text;
 }

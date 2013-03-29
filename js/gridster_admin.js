@@ -522,7 +522,7 @@ $(".gridster li .admin-html-holder a")
              }             
          });
    
-         $('.gridster_edit_area').editable( function( value, settings ) { 
+         $('.gridster_edit-area').editable( function( value, settings ) { 
              return(value);
           }, {
              type      : 'autogrow',
@@ -610,6 +610,60 @@ $(".gridster li .admin-html-holder a")
         // hide loader
         $('#gridster_load-wrap').fadeOut();   
     }
+    
+    $.fn.updateMetaboxLayout = function ( ) {
+        var theme_content_width = parseInt( $('.gridster ul').data('content_width') );
+        var metabox_width = parseInt( $('#gridster_workbench_metabox').width() );
+        // width plus margin
+        var gridster_content_blocks_width = 280 + 20; //parseInt( $('#gridster_content_blocks').width() );
+        
+        // workbench is smaller than themes $content_width
+        if (
+        (
+            $('#post-body').hasClass('columns-1')
+            &&
+            ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width )        
+        )
+        ||
+        ( 
+            $('#gridster_workbench_metabox').hasClass('two-columns')
+            &&
+            ( ( theme_content_width + gridster_content_blocks_width ) > metabox_width )
+        )
+        ) {
+            // toggle CSS classes
+            $('#gridster_workbench_metabox').removeClass('two-columns').addClass('one-column');
+            // wrap widget blocks in two column-wraps to adjust the way our accordion works
+            // get all widget-blocks
+            var widgets = $('.gridster_widget-block');
+            // get the half, to know where to slice the list
+            var half = Math.floor( widgets.length/2 );
+            // the wrap the first and the second half into divs
+            widgets.filter(function(i){ return i <= half; }).wrapAll('<div class="accordion-wrap" />');
+            widgets.filter(function(i){ return i > half; }).wrapAll('<div class="accordion-wrap" />');
+            // now trigger each first widget-block to expand
+            //$('.accordion-wrap .gridster_widget-block:first h3').trigger('click');
+        
+        // workbench is wider than themes $content_width        
+        } else if (
+        (
+            $('#post-body').hasClass('columns-2')
+            &&
+            ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width )        
+        )
+        ||
+        ( 
+            $('#gridster_workbench_metabox').hasClass('one-column')
+            &&
+            ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width )
+        )        
+        ) {
+            // toggle CSS classes
+            $('#gridster_workbench_metabox').addClass('two-columns').removeClass('one-column');        
+            // remove column wrapping from widget-blocks
+            $('.accordion-wrap .gridster_widget-block').unwrap();
+        } 
+    }
 
 }); 
 
@@ -627,27 +681,26 @@ jQuery(document).ready(function($) {
      *  @source   http://www.normansblog.de/simple-jquery-accordion/
      *  
      */              
-    $('.gridster_widget-block h3, .gridster_widget-block .handlediv').not('.trigger_active').siblings('.inside').hide();
-    $('.gridster_widget-block h3, .gridster_widget-block .handlediv').click( function() {
-    		var trig = $(this);
+    $.fn.WidgetBlockAccordion = function ( trig ) {
     		if ( trig.parent().hasClass('trigger_active') ) {
       			trig.siblings('.inside').slideToggle('fast');
       			trig.parent().removeClass('trigger_active');
+      			trig.parent().siblings('.trigger_active').removeClass('trigger_active');            
+
     		} else {
-      			$('.trigger_active').find('.inside').slideToggle('fast');
-      			$('.trigger_active').removeClass('trigger_active');
+      			trig.parent().siblings('.trigger_active').removeClass('trigger_active').find('.inside').slideToggle('fast');
       			trig.siblings('.inside').slideToggle('fast');
-      			trig.parent().addClass('trigger_active');
+            trig.parent().addClass('trigger_active');
     		};
-    		return false;
+    		return false;    
+    }
+    // close all widget-blocks
+    $('.gridster_widget-block h3, .gridster_widget-block .handlediv').not('.trigger_active').siblings('.inside').hide();
+    // trigger accordion expander on click
+    $('.gridster_widget-block h3, .gridster_widget-block .handlediv').click( function() {
+        $.fn.WidgetBlockAccordion( $(this) );
     });
-    
-    
-    
-    /**
-     *  Show first widget-block
-     *  
-     */
+    // Show first widget-block
     $('.gridster_widget-block:first h3').trigger('click');               
 
 
@@ -666,6 +719,8 @@ jQuery(document).ready(function($) {
         .css( 'left', theme_content_width + 'px' )
         .appendTo( $('.gridster') );                         
 
+
+
     // initial load all widgets from DB     
     $.fn.LoadWidgetsOnStart();
     
@@ -675,4 +730,39 @@ jQuery(document).ready(function($) {
     // and if we save two times, without doing changes we'll get 
     // some HTML mess
     //$.fn.updateGridsterLayoutSettings();     
+    
+    
+    
+    /**
+     *  Test if workbench is wide enough to fit $content_width
+     *  
+     *  check this 
+     *  - on load, 
+     *  - on screen resize 
+     *  - if menu is collapsed or opened
+     *  - if column preferences are change within screen-options-tab      
+     *  
+     *  @since    1.0
+     *  
+     */
+    // on load                                   
+    $.fn.updateMetaboxLayout();    
+    // on resize
+    $(window).resize(function() {
+        $.fn.updateMetaboxLayout();
+    });
+    // on menu collapse / open  
+    $('#collapse-menu').on( 'click.collapse-menu', function(){
+        // use timeout, to make sure all layout changes are applied
+        setTimeout(function(){
+                $.fn.updateMetaboxLayout();    
+        },500);
+    });
+    // or if user has choosen between 1- and 2-columns layout within screen-options-tab 
+    $('.columns-prefs input').on( 'change', function(){
+        // use timeout, to make sure all layout changes are applied
+        setTimeout(function(){
+                $.fn.updateMetaboxLayout();    
+        },500);
+    });    
 });
