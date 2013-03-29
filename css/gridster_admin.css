@@ -7,7 +7,7 @@
 #adminmenu #menu-posts-gridster div.wp-menu-image,
 #icon-edit.icon32-posts-gridster,
 .gridster_edit:before,
-.gridster_edit_area:before {
+.gridster_edit-area:before {
     background-image: url('../images/gridster_sprite.png');
     background-repeat: no-repeat;
 }
@@ -332,13 +332,13 @@
  * JEDITABLE ELEMENTS
 /******************************************************************************/
 .gridster_edit,
-.gridster_edit_area {
+.gridster_edit-area {
     position: relative;
     padding: 2px 20px;
     min-height: 1em;    
 }
 .gridster_edit:before,
-.gridster_edit_area:before {
+.gridster_edit-area:before {
     position: absolute;
     top: 2px;
     left: 2px;
@@ -349,12 +349,16 @@
     background-position: 0 -164px;
 }
 .gridster_edit:hover,
-.gridster_edit_area:hover {
+.gridster_edit-area:hover {
     background-color: rgba(255, 255, 224, .7);
     cursor: text;
 }
+.gridster_edit.isEdited,
+.gridster_edit-area.isEdited {
+    background-color: transparent;
+}
     .gridster_edit form input,
-    .gridster_edit_area form textarea {
+    .gridster_edit-area form textarea {
         line-height: 1em;
         margin: 0;
         max-width: 95%;
@@ -362,7 +366,13 @@
         min-height: 1em;
         resize-x: none;
     }
-
+    .gridster .gridster_edit-area form button {
+        margin: 5px 5px 0 0;
+    }
+    .gridster_edit-area form button.button-primary {
+        height: 22px;
+        line-height: 21px;    
+    }
 
 
 /******************************************************************************
