@@ -562,6 +562,7 @@ $(".gridster li .admin-html-holder a")
      $.fn.initJeditable();
      
      
+     
          
     /**
      *  Load saved widgets from hidden input
@@ -591,7 +592,6 @@ $(".gridster li .admin-html-holder a")
     
             // prepare HTML for new widget
             var widget_html = $('<div>').addClass( 'admin-html-holder' ).html( o.html );                    
-//            widget_html = $('<li>').attr('data-post_id', o.id ).html( widget_html );
             widget_html = $('<li>').attr('data-post_id', o.id ).append( widget_html );            
             
             // make new widget resizable
@@ -611,6 +611,15 @@ $(".gridster li .admin-html-holder a")
         $('#gridster_load-wrap').fadeOut();   
     }
     
+    
+    
+    /**
+     *  Adjust Column view according to 
+     *  window-width, meta_box-width or screen-preferences setting
+     *  
+     *  @since    1.0
+     *  
+     */                     
     $.fn.updateMetaboxLayout = function ( ) {
         var theme_content_width = parseInt( $('.gridster ul').data('content_width') );
         var metabox_width = parseInt( $('#gridster_workbench_metabox').width() );
@@ -764,5 +773,38 @@ jQuery(document).ready(function($) {
         setTimeout(function(){
                 $.fn.updateMetaboxLayout();    
         },500);
-    });    
+    });  
+
+
+
+    /**
+     *  Add WordPress UI default styles to Jeditable form buttons
+     *  
+     *  @since    1.0
+     *  
+     */                    
+    $('.gridster_edit-area').on( 'click', function(){
+        // use timeout, to make sure all layout changes are applied
+        setTimeout(function(){
+               $('button[type="submit"]').addClass('button-primary');
+               $('button[type="cancel"]').addClass('button-secondary');                  
+        },1);
+    }); 
+    
+    // toggle Class on Jeditable elements when edited
+    $('.gridster_edit, .gridster_edit-area').click( function() {
+        if ( $(this).hasClass( 'isEdited' ) ) {
+            $(this).removeClass( 'isEdited' );        
+        } else {
+            $(this).addClass( 'isEdited' );        
+        }
+    }); 
+/*
+    // toggle Class on Jeditable elements when edited
+    $('.gridster_edit input, .gridster_edit-area input').click( function() {
+        if ( $(this).parent().parent().hasClass( 'isEdited' ) ) {
+            $(this).parent().parent().removeClass( 'isEdited' );        
+        } 
+    });
+*/               
 });
