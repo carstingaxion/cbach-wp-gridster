@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: 			Gridster
-Plugin URI:       http://github/carstingaxion/
-Description:      Create individual layouted blocks from your Content using gridster.js
+Plugin URI:       https://github.com/carstingaxion/cbach-wp-gridster
+Description:      Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 Author:      			Carsten Bach
 Version: 					1.0
-Author URI:    		http://github/carstingaxion/
+Author URI:    		http://carsten-bach.de
 */
 
 
@@ -63,8 +63,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @see   __construct()         
          *   @type  string
          */         
-        protected $minified_files = '';    
-        
+        protected $minified_js_files = '';    
+        protected $minified_css_files = '';        
              
         /**
          *   Internal prefix for creating CSS classes and ids
@@ -133,8 +133,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             $this->base_name = plugin_basename( __FILE__ ); 
             
             //
-            $this->minified_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
-
+            $this->minified_js_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
+            $this->minified_css_files = ( defined('WP_DEBUG') && constant('WP_DEBUG') ) ? '' : 'min.';
             //Hook up to the init action
         		add_action( 'init', array( &$this, 'init' ) );
       
@@ -259,7 +259,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 add_filter( 'plugin_action_links_' . $this->base_name, array( &$this, 'plugin_action_links'), 10 );
                 
                 // Add additional links to plugin-description-section
-#                add_filter( 'plugin_row_meta', array( &$this, 'plugin_row_meta' ), 10, 2 );               
+                add_filter( 'plugin_row_meta', array( &$this, 'plugin_row_meta' ), 10, 2 );               
 
             } else {
                 
@@ -299,11 +299,11 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             
             // get gridster styles for our workbench
             if ( $this->current_screen->base == 'post' && $this->current_screen->post_type == $this->cpt_gridster ) {
-                wp_register_style( 'jquery-ui-base-css', plugins_url( '/css/jquery-ui-base.css', __FILE__ ), $deps, '1.0' );         
+                wp_register_style( 'jquery-ui-base-css', plugins_url( '/css/jquery-ui/jquery-ui-base.'.$this->minified_css_files.'css', __FILE__ ), $deps, '1.0' );         
                 wp_enqueue_style( 'jquery-ui-base-css' );
                 $deps[] = 'jquery-ui-base-css'; 
 
-                wp_register_style( $this->prefix.'lib_css', plugins_url( '/css/gridster/jquery.gridster.'.$this->minified_files.'css', __FILE__ ), $deps, $this->gridster_version );
+                wp_register_style( $this->prefix.'lib_css', plugins_url( '/css/gridster/jquery.gridster.'.$this->minified_css_files.'css', __FILE__ ), $deps, $this->gridster_version );
                 wp_enqueue_style( $this->prefix.'lib_css' );            
             }   
         }
@@ -324,7 +324,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
               'textMoveHandle' => esc_attr__( 'Move', 'cbach-wp-gridster' ),              
               'textDelete' => esc_attr__( 'Delete', 'cbach-wp-gridster' ),
               'textAjaxLoadProblem' => __( 'There was a problem loading your content, please try again.', 'cbach-wp-gridster' ),
-              'textMaximumContentWidth' => esc_attr__( 'Maximum content width defined in your current theme.', 'cbach-wp-gridster' ),
+              'textMaximumContentWidth' => esc_attr__( 'Maximum content width defined in your current theme by the variable $content_width.', 'cbach-wp-gridster' ),
               
               'JeditableToolTip' => esc_attr__( 'Click to edit', 'cbach-wp-gridster' ),
               'JeditableCancel' => esc_attr__( 'Cancel', 'cbach-wp-gridster' ),              
@@ -349,13 +349,13 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             if ( $this->current_screen->base == 'post' && $this->current_screen->post_type == $this->cpt_gridster ) {
                 
                 // gridster lib
-#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_files.'js', __FILE__ ), $deps, $this->gridster_version );
-                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.with-extras.'.$this->minified_files.'js', __FILE__ ), $deps, $this->gridster_version );                
+#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
+                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.with-extras.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );                
                 wp_enqueue_script( $this->prefix.'lib_js' );
                 $deps[] = $this->prefix.'lib_js';  
                 
                 // jeditable for inline editing of widget content
-                wp_register_script( 'jquery_jeditable_js', plugins_url( '/js/jeditable/jquery.jeditable.'.$this->minified_files.'js', __FILE__ ), $deps, '1.7.1' );
+                wp_register_script( 'jquery_jeditable_js', plugins_url( '/js/jeditable/jquery.jeditable.'.$this->minified_js_files.'js', __FILE__ ), $deps, '1.7.1' );
                 wp_enqueue_script( 'jquery_jeditable_js' );
                 $deps[] = 'jquery_jeditable_js';          
                                       
@@ -409,7 +409,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             $deps = array('jquery' );
            
             // gridster lib
-            wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_files.'js', __FILE__ ), $deps, $this->gridster_version );
+            wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
             wp_enqueue_script( $this->prefix.'lib_js' );
             $deps[] = $this->prefix.'lib_js';                
 
@@ -490,7 +490,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 #'capabilities' => array(),
                 #'map_meta_cap' => false,
                 'hierarchical' => false,                  
-                'supports' => array( 'title', 'author' ),
+                'supports' => array( 'title', 'revisions', 'author' ),
                 'register_meta_box_cb' =>  array( &$this, 'add_meta_boxes' ),   
                 #'taxonomies' => array(),                
                 'has_archive' => false,
@@ -630,7 +630,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // add "Workbench" meta box to gridster post_types
 	          add_meta_box( 
                 'gridster_workbench_metabox', 
-                __( 'Layout your content here', 'cbach-wp-gridster' ), 
+                __( 'Gridster', 'cbach-wp-gridster' ), 
                 array( &$this, 'gridster_workbench_meta_box' ), 
                 $this->cpt_gridster, 
                 'normal', 
@@ -640,12 +640,37 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // add "Options" meta box to gridster post_types
 	          add_meta_box( 
                 'gridster_options_metabox', 
-                __( 'Layout options', 'cbach-wp-gridster' ), 
+                __( 'Gridster - Layout options', 'cbach-wp-gridster' ), 
                 array( &$this, 'gridster_options_meta_box' ), 
                 $this->cpt_gridster, 
                 'side', 
                 'default'
-            );            
+            );
+            // add CSS classes filter for workbench-metabox            
+            add_filter( 'postbox_classes_gridster_gridster_workbench_metabox', array( &$this, 'postbox_classes_post_gridster_workbench_metabox' ) );
+        }
+        
+        
+        
+        /**
+         *  Add CSS class to metabox
+         *  
+         *  by default, set this to a 2-columns layout,
+         *  whta will be changed by JS on resizing the workbench
+         *  
+         *  @since    1.0
+         *  
+         *  @param    array     all CSS classes applied to this metabox
+         *  
+         *  @return   array     all updated CSS classes
+         *  
+         */                                                                                                           
+        function postbox_classes_post_gridster_workbench_metabox( $classes ) {
+            // In order to ensure we don't duplicate classes, we should
+            // check to make sure it's not already in the array 
+            if( !in_array( 'two-columns', $classes ) )
+                $classes[] = 'two-columns';
+            return $classes;
         }
         
         
@@ -674,28 +699,11 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             $gridster_layout = get_post_meta( $post->ID, '_gridster_layout', true );
             echo '<input type="hidden" id="'.$this->prefix.'layout" name="'.$this->prefix.'layout" value="'.esc_attr($gridster_layout).'" size="100"/>';            
             
-            // render widget-blocks to work with
-            echo '<div id="'.$this->prefix.'content_blocks">';
-            
-                // all post_types
-                foreach ( (array) $this->get_post_types_as_widget_blocks() as $post_type ) {
-                    echo $this->get_posts_by_type_widget_block ( $post_type );
-                }
-                
-                // @todo 
-                // add widget_blocks for all taxonomies
-                
-            
-            echo '</div> <!-- // end div#'.$this->prefix.'content_blocks -->';
-            
             // render gridster work-bench
             echo '<div id="'.$this->prefix.'workbench_wrap">';
             
                 // this is our gridster workbench
                 echo '<div id="'.$this->prefix.'workbench" class="gridster"><ul data-content_width="' . $content_width . '">';
-                # debug only
-                #  echo '<li data-row="1" data-col="1" data-sizex="7" data-sizey="7"><h1>Grid One</h1></li> <li data-row="1" data-col="2" data-sizex="3" data-sizey="3"><h1>Grid Two</h1></li> <li data-row="=1" data-col="3" data-sizex="2" data-sizey="3"><h1>Grid Three</h1></li> <li data-row="1" data-col="2" data-sizex="2" data-sizey="1"><h1>Grid Four</h1></li> <li data-row="2" data-col="2" data-sizex="2" data-sizey="2"><h1>Grid Five</h1></li> <li data-row="1" data-col="4" data-sizex="1" data-sizey="1"><h1>Grid Six</h1></li> <li data-row="2" data-col="4" data-sizex="2" data-sizey="1"><h1>Grid Seven</h1></li> <li data-row="3" data-col="4" data-sizex="1" data-sizey="1"><h1>Grid Eight</h1></li> <li data-row="1" data-col="5" data-sizex="1" data-sizey="1"><h1>Grid Nine</h1></li> <li data-row="3" data-col="5" data-sizex="1" data-sizey="1"><h1>Grid Ten</h1></li> <li data-row="1" data-col="6" data-sizex="1" data-sizey="1"><h1>Grid Eleven</h1></li> <li data-row="2" data-col="6" data-sizex="1" data-sizey="2"><h1>Grid Twelve</h1></li>';
-                #  echo '<li data-row="1" data-col="1" data-sizex="3" data-sizey="2">';                
                 echo '</ul></div> <!-- // end div#'.$this->prefix.'workbench -->';
                 
                 // add loader
@@ -715,6 +723,20 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                     ) . '</div></noscript>';                
                             
             echo '</div> <!-- // end div#'.$this->prefix.'workbench_wrap -->';             
+
+            // render widget-blocks to work with
+            echo '<div id="'.$this->prefix.'content_blocks">';
+            
+                // all post_types
+                foreach ( (array) $this->get_post_types_as_widget_blocks() as $post_type ) {
+                    echo $this->get_posts_by_type_widget_block ( $post_type );
+                }
+                
+                // @todo 
+                // add widget_blocks for all taxonomies
+                
+            
+            echo '</div> <!-- // end div#'.$this->prefix.'content_blocks -->';
         }
         
         
@@ -776,10 +798,16 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                
         private function get_posts_by_type_widget_block ( $post_type ) {
-            
+            // globalize current gridster $post object ....
+            global $post;
+            // to save it for re-publizizing it after our loops
+            // because something is really wired here, 
+            // revisions for this gridster post point to the last post looped in the widget-blocks
+            $current_gridster_post = $post;
+
             $pt = get_post_type_object( $post_type );
             
-            $args = array(
+            $gridster_args = array(
               'orderby'=> 'modified',
               'order' => 'DESC',
               'post_type' => $pt->name,
@@ -787,12 +815,14 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
               'posts_per_page' => 10,
               'post__not_in' => $this->post_settings['query_posts_not_in'],
             );
-            $args = apply_filters( 'gridster_get_posts_by_type_query_args', $args, $pt );
-            $last = $html = $post_links = null;
-            $last = new WP_Query($args);
+            $args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
+            $gridster_last = $html = $post_links = null;
+            $gridster_last = new WP_Query($gridster_args);
             
-            if( $last->have_posts() ) : 
-                while ( $last->have_posts()) : $last->the_post();
+            if( $gridster_last->have_posts() ) : 
+
+                while ( $gridster_last->have_posts()) : $gridster_last->the_post();
+
                     $post_links .= '<li rel="' . get_the_ID() . '">' . 
                                        '<span title="' . esc_attr( get_the_excerpt() ) . '">' . get_the_title() .'</span>'.
                                        '<small class="modified-date howto alignright">'.
@@ -816,8 +846,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 $html .= '</div> <!-- // end div#'.$this->prefix.'post_type-'.$pt->name.'-widget-block -->';  
                         
             endif;
+
             wp_reset_query();  
-            wp_reset_postdata(); 
+            // reset $post object to our current gridster, to make revisions metabox work properly
+            $post = $current_gridster_post;
             return $html;
         } 
         
@@ -1366,7 +1398,35 @@ global $post;
             return $links;        
         }
         
-        
+    
+    
+        /**
+         *   Add additional links to the plugin description
+         *   
+         *  @since    1.0
+         *  
+         *  @param    array     predefined list of links, containing 1. Author-URL, 2. Plugin-URL
+         *  @param    string    current plugin file
+         *  
+         *  @return   array     updated list of links
+         *  
+         */               
+        function plugin_row_meta ( $links, $file ) {
+         
+            // are we really on gridster plugin
+            if ( $file == $this->base_name ) {
+                return array_merge(
+                    $links,
+                    array( 
+                        '<a href="https://github.com/carstingaxion/cbach-wp-gridster/issues">' . __( 'Report issues', 'cbach-wp-gridster' ) . '</a>', 
+                        '<a href="http://wordpress.org/support/plugin/gridster">' . __( 'Support', 'cbach-wp-gridster' ) . '</a>',              
+                    )
+                );
+            }
+            return $links;
+        }
+
+
 
         /**
          *  Filter image size on AJAX requests
