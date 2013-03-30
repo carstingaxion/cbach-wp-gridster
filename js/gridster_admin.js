@@ -759,7 +759,8 @@ $(".gridster li .admin-html-holder a")
     $.fn.doneTyping = function( input ) {
         input.parentsUntil('.gridster_widget-block').parent().find('.spinner').show();
         var post_type = input.parentsUntil('.gridster_widget-block').parent().data('post_type');
-        var paged =  input.data('paged');
+        // on the first search, we want to start on page one
+        var paged =  1;
         var search = $.trim( input.val() );
         $.fn.getPostsByType( post_type, paged = paged, search );   
     }                

@@ -1444,7 +1444,7 @@ fb( get_posts( array( 'post_type' => 'gridster') ) );
 
             $html .= '<div class="widget-block-paginav">';
                 $html .= '<button type="button" class="alignleft button-secondary get-previous-posts widget-blocks-pagination" data-search="' .  $s . '" data-paged="' .  $paged_prev . '" ' . ( ( $paged_prev < 1 || $paged_prev == $paged ) ? 'disabled="disabled"' : '' ) . ' title="'. sprintf( __( 'Get previous %s', 'cbach-wp-gridster' ), $pt->labels->name ) .'">&laquo;</button>';                
-                $html .= '<input type="text" class="'. $this->prefix.'search-posts-by-type" name="'. $this->prefix.'search-posts-by-type" placeholder="'.__( 'Search', 'cbach-wp-gridster' ).'" value="'.$s.'" data-paged="' .  $paged . '" title="' . __( 'Type searchterm  & wait 2 seconds', 'cbach-wp-gridster' ) .'">';
+                $html .= '<input type="text" class="'. $this->prefix.'search-posts-by-type" name="'. $this->prefix.'search-posts-by-type" placeholder="'.__( 'Search', 'cbach-wp-gridster' ).'" value="'.$s.'" title="' . __( 'Type searchterm  & wait 2 seconds', 'cbach-wp-gridster' ) .'">';
                 $html .= '<button type="button" class="alignright button-secondary get-next-posts widget-blocks-pagination" data-search="' .  $s . '" data-paged="' . $paged_next . '" ' . ( ( $paged_next > $gridster_last->max_num_pages || $paged_next == $paged ) ? 'disabled="disabled"' : '' ) . ' title="'. sprintf( __( 'Get next %s', 'cbach-wp-gridster' ), $pt->labels->name ) .'">&raquo;</button>';
             $html .= '</div>';
 
