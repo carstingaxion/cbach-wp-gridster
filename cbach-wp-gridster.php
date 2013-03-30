@@ -4,7 +4,7 @@ Plugin Name: 			Gridster
 Plugin URI:       https://github.com/carstingaxion/cbach-wp-gridster
 Description:      Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 Author:      			Carsten Bach
-Version: 					1.0
+Version: 					1.1
 Author URI:    		http://carsten-bach.de
 */
 
@@ -45,7 +45,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @used  when enqueuing scripts & styles
          *   @type  string
          */      	
-        protected $version = '1.0';
+        protected $version = '1.1';
         
         
         /**
@@ -132,9 +132,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // Used by some fn, i.e. add_settings_link() later.
             $this->base_name = plugin_basename( __FILE__ ); 
             
-            //
+            // wether to use concetenated scripts & styles or the developer versions
             $this->minified_js_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
-            $this->minified_css_files = ( defined('WP_DEBUG') && constant('WP_DEBUG') ) ? '' : 'min.';
+            $this->minified_css_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
+            
             //Hook up to the init action
         		add_action( 'init', array( &$this, 'init' ) );
       
@@ -149,6 +150,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       
       	/**
       	 *   Run during the activation of the plugin
+      	 *   
+      	 *   @since    1.0                  
       	 *   
       	 */                  
       	public function activate() {
@@ -165,6 +168,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         /**
       	 *   Run during the deactivation of the plugin
       	 *   
+      	 *   @since                    
+      	 *   
       	 */                  
       	public function deactivate() {
             
@@ -176,7 +181,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         /**
       	 *   Run during the uninstallation of the plugin
       	 *   
-      	 *   Delete all 'gridster' posts and its post_meta                   
+      	 *   Delete all 'gridster' posts and its post_meta 
+      	 *   
+      	 *   @since    1.0                                    
       	 *   
       	 */                  
       	public function uninstall() {
@@ -204,6 +211,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       
       	/*
       	*		Run during the initialization of Wordpress
+      	*		
+      	*    @since    1.0                
       	*/
       	public function init() {
 
@@ -212,14 +221,11 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 // Setup localization, we need this in 'wp-admin' only
               	load_plugin_textdomain( 'cbach-wp-gridster', false, dirname( $this->base_name ) . '/languages' );
 
-
                 // Append Stylesheet(s) to WP BackEnd
                 add_action( 'admin_print_styles', array( &$this, 'admin_css' ) );
 
                 // Append JavaScript(s) to WP BackEnd
                 add_action( 'admin_head', array( &$this, 'admin_js' ) );  
-                
-
 
                 // Add columns to gridster list
                 add_filter( 'manage_edit-gridster_columns', array( &$this, 'gridster_column_header_function' ) );                
@@ -248,10 +254,21 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 // show customized "updated" messages
                 add_filter( 'post_updated_messages', array( &$this, 'post_updated_messages' ) );                          
         
-                //
+                // add HTML attribute of "autocomplete='off'" to form element on post.php and edit.php
                 add_action( 'post_edit_form_tag', array( &$this, 'post_edit_form_tag' ) );
-                       
+                 
+		            // load TinyMCE Plugin to replace gridster shortcode with graphical zone
+                add_filter('mce_external_plugins', array( &$this, 'mce_external_plugins' ));
                 
+                // load TinyMCE CSS to style the graphical shortcode 
+                add_filter('tiny_mce_before_init', array( &$this, 'tiny_mce_before_init' ) );                       
+                
+                // add Shortcode-Button to TinyMCE 
+                add_filter('mce_buttons', array( &$this, 'mce_buttons' ) );
+                
+                // load transaltions for TinyMCE Plugin
+                add_filter( 'mce_external_languages', array( &$this, 'mce_external_languages' ) );
+
                 // modify post_types usable as gridster-widgets
                 add_filter( 'gridster_post_types_as_widget_blocks', array( &$this, 'filter_gridster_post_types_as_widget_blocks' ) );
                 
@@ -260,6 +277,15 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 
                 // Add additional links to plugin-description-section
                 add_filter( 'plugin_row_meta', array( &$this, 'plugin_row_meta' ), 10, 2 );               
+
+                // AJAX callback to get templated HTML by $post->ID as gridster-widegt        
+                add_action( 'wp_ajax_ajax_gridster_get_post', array( &$this, 'ajax_gridster_get_post' ) );
+                
+                // AJAX callback for TinyMCE modal, initiated by Button
+                add_action('wp_ajax_ajax_gridster_shortcode_update_modal', array( &$this, 'ajax_gridster_shortcode_update_modal' ) );
+
+                // AJAX callback for TinyMCE modal, initiated by Button
+                add_action('wp_ajax_ajax_get_posts_by_type_widget_block', array( &$this, 'ajax_get_posts_by_type_widget_block' ) );
 
             } else {
                 
@@ -277,15 +303,14 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // apply image size filter to all AJAX requests        
             add_filter( 'post_thumbnail_size', array( &$this, 'filter_image_size_on_ajax_request' ) );            
             
-            // callback for AJAX Call to get templated HTML post by ID        
-            add_action( 'wp_ajax_ajax_gridster_get_post', array( &$this, 'ajax_gridster_get_post' ) );
-            add_action( 'wp_ajax_nopriv_ajax_gridster_get_post', array( &$this, 'ajax_gridster_get_post' ) );                   
       	}
 
 
-        
+            
         /**
          *  Adds a Stylesheet to the WP BE
+         *  
+         *  @since    1.0                  
          *  
          */                          
         public function admin_css () {
@@ -324,6 +349,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
               'textMoveHandle' => esc_attr__( 'Move', 'cbach-wp-gridster' ),              
               'textDelete' => esc_attr__( 'Delete', 'cbach-wp-gridster' ),
               'textAjaxLoadProblem' => __( 'There was a problem loading your content, please try again.', 'cbach-wp-gridster' ),
+              'textAjaxNothingFound' => __( 'Nothing found.', 'cbach-wp-gridster'),
               'textMaximumContentWidth' => esc_attr__( 'Maximum content width defined in your current theme by the variable $content_width.', 'cbach-wp-gridster' ),
               
               'JeditableToolTip' => esc_attr__( 'Click to edit', 'cbach-wp-gridster' ),
@@ -729,7 +755,15 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             
                 // all post_types
                 foreach ( (array) $this->get_post_types_as_widget_blocks() as $post_type ) {
-                    echo $this->get_posts_by_type_widget_block ( $post_type );
+                    $pt = get_post_type_object( $post_type );
+                    
+                    echo '<div id="'.$this->prefix.'post_type-'.$pt->name.'-widget-block" class="'.$this->prefix.'post_type-widget-block '.$this->prefix.'widget-block" data-post_type="'.$pt->name.'">';
+                        echo '<div class="handlediv" title="' . esc_attr__('Click to toggle') . '"><br></div>';
+                        echo '<h3 class=""><span>'.$pt->labels->name.'</span></h3>';
+                        echo '<div class="inside"></div>';
+                        echo '<span class="spinner"></span>';
+                    echo '</div> <!-- // end div#'.$this->prefix.'post_type-'.$pt->name.'-widget-block -->';  
+                 
                 }
                 
                 // @todo 
@@ -787,74 +821,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         
         
         
-        /**
-         *  Get HTML-List of posts, usable as gridster widgets
-         *  
-         *  @since    1.0
-         *  
-         *  @param    string    post_type name
-         *  
-         *  @return   string    HTML of widget-blocks
-         *  
-         */                                                                                
-        private function get_posts_by_type_widget_block ( $post_type ) {
-            // globalize current gridster $post object ....
-            global $post;
-            // to save it for re-publizizing it after our loops
-            // because something is really wired here, 
-            // revisions for this gridster post point to the last post looped in the widget-blocks
-            $current_gridster_post = $post;
-
-            $pt = get_post_type_object( $post_type );
-            
-            $gridster_args = array(
-              'orderby'=> 'modified',
-              'order' => 'DESC',
-              'post_type' => $pt->name,
-              'post_status' => 'publish',
-              'posts_per_page' => 10,
-              'post__not_in' => $this->post_settings['query_posts_not_in'],
-            );
-            $args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
-            $gridster_last = $html = $post_links = null;
-            $gridster_last = new WP_Query($gridster_args);
-            
-            if( $gridster_last->have_posts() ) : 
-
-                while ( $gridster_last->have_posts()) : $gridster_last->the_post();
-
-                    $post_links .= '<li rel="' . get_the_ID() . '">' . 
-                                       '<span title="' . esc_attr( get_the_excerpt() ) . '">' . get_the_title() .'</span>'.
-                                       '<small class="modified-date howto alignright">'.
-                                           '<abbr title="' . sprintf(
-                                              __('Last edited by %1$s on %2$s at %3$s'), 
-                                              esc_html( get_the_modified_author() ), 
-                                              get_the_modified_date(), 
-                                              get_the_modified_date('H:i')
-                                              ) . 
-                                              '">' . get_the_modified_date('d.m.\'y') . 
-                                            '</abbr>'.
-                                        '</small>' .
-                                   '</li>';
-
-                endwhile;
-                
-                $html  = '<div id="'.$this->prefix.'post_type-'.$pt->name.'-widget-block" class="'.$this->prefix.'post_type-widget-block '.$this->prefix.'widget-block">';
-                    $html .= '<div class="handlediv" title="' . esc_attr__('Click to toggle') . '"><br></div>';
-                    $html .= '<h3 class=""><span>'.$pt->labels->name.'</span></h3>';
-                    $html .= '<div class="inside"><ul>' . $post_links . '</ul></div>';
-                $html .= '</div> <!-- // end div#'.$this->prefix.'post_type-'.$pt->name.'-widget-block -->';  
-                        
-            endif;
-
-            wp_reset_query();  
-            // reset $post object to our current gridster, to make revisions metabox work properly
-            $post = $current_gridster_post;
-            return $html;
-        } 
-        
- 
-        
 /***************************************************************************************************************************************************************************************************
  *
  *  SETTINGS
@@ -901,10 +867,11 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 $this->get_default_settings(), 
                 $this->default_settings 
             );
-            
+
             if ( is_admin() ) {
 
                 global $post;
+                
                 if ( is_object( $post ) ) {
                     $this->load_post_settings( $post->ID );                
                 } elseif ( isset( $_GET['post'] ) ) {
@@ -923,6 +890,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @since    1.0      
          */
         public function load_post_settings( $post_id ) {
+        
+            // already loaded ?
+            if ( isset( $this->post_settings['query_posts_not_in'] ) )
+                return;
 
             // get layout of this gridster
             $this->post_settings['layout'] = get_post_meta( $post_id, '_gridster_layout', true );
@@ -1244,16 +1215,31 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             
         }                                                                                   
 
+
+
+        /**
+         *  Add HTML attribute of "autocomplete='off'" to form element
+         *  of post.php and edit.php for gridster post_types
+         *  to prevent Browsers from prefilling our hidden inputs
+         *  
+         *  Because some browsers parse our escaped HTML in the 
+         *  'layout' input back as unescaped HTML, which follows in JS errors
+         *  when the gridster is initiated
+         *  
+         *  @since    1.0
+         *  
+         *  @return   string    HTML autocomplete attribute
+         *  
+         */                                                                                                                    
         public function post_edit_form_tag () {
-
-global $post;
-
+            global $post;
             // check if we're on the right post_type 
             if ( $this->cpt_gridster != $post->post_type ) 
                 return;
-               
             echo ' autocomplete="off"';
         }
+
+
 
 /***************************************************************************************************************************************************************************************************
  *
@@ -1355,6 +1341,122 @@ global $post;
         
         
         
+        /**
+         *  AJAX callback for TinyMCE modal
+         *  called from TinyMCE-Button-Click 
+         *  or from the edit-handler-Button situated at a 
+         *  visual replaced shortcode inside the editor
+         *  
+         *  @since    1.1
+         *  
+         *  @return   string    HTML of the modal window, showing a list of all available gridster-posts
+         *  
+         */                                                                                 
+        public function ajax_gridster_shortcode_update_modal ( ) {
+fb( get_posts( array( 'post_type' => 'gridster') ) );
+            echo '<div id="' . $this->prefix . 'modal-content">';
+            
+            echo '</div>';
+            die;
+        }
+
+
+
+        /**
+         *  AJAX callback for listing posts per post_type
+         *  inside the widget-blocks
+         *  used for default lists and search-results
+         *  
+         *  @since    1.1
+         *  
+         *  return    string    HTML of available posts or error message
+         *  
+         */                                                                                
+        public function ajax_get_posts_by_type_widget_block (  ) {
+
+            // verifies the AJAX request to prevent external processing requests  
+            check_ajax_referer( $this->nonce, 'nonce' );
+          
+            // get options Array from AJAX Request
+            $options = ( is_array( $_REQUEST['options'] ) ) ? $_REQUEST['options'] : false;
+        
+            // end if something strange is given by AJAX
+            if ( $options === false )
+                die();
+      
+            // what post_type to loop
+            $pt = get_post_type_object( $options['post_type'] );
+            
+            // get current page
+            $paged = ( !empty( $options['paged'] ) ) ? $options['paged'] : 1;
+            $paged_prev = $paged - 1;            
+            $paged_next = $paged + 1;
+            
+            // define query arguments
+            $gridster_args = array(
+              'orderby'=> 'modified',
+              'order' => 'DESC',
+              'post_type' => $pt->name,
+              'post_status' => 'publish',
+              'posts_per_page' => 10,
+              'post__not_in' => $this->post_settings['query_posts_not_in'],
+              'paged' => $paged,
+            );
+            
+            // do search
+            $s = null;
+            if ( !empty( $options['search'] ) ) {
+                $s = $options['search'];
+                $gridster_args['s'] = $s;
+            }
+            
+            $args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
+            $gridster_last = $html = $post_links = null;
+            $gridster_last = new WP_Query($gridster_args);
+            
+            if( $gridster_last->have_posts() ) : 
+
+                while ( $gridster_last->have_posts()) : $gridster_last->the_post();
+
+                    $post_links .= '<li rel="' . get_the_ID() . '">' . 
+                                       '<span title="' . esc_attr( get_the_excerpt() ) . '">' . get_the_title() .'</span>'.
+                                       '<small class="modified-date howto alignright">'.
+                                           '<abbr title="' . sprintf(
+                                              __('Last edited by %1$s on %2$s at %3$s'), 
+                                              esc_html( get_the_modified_author() ), 
+                                              get_the_modified_date(), 
+                                              get_the_modified_date('H:i')
+                                              ) . 
+                                              '">' . get_the_modified_date('d.m.\'y') . 
+                                            '</abbr>'.
+                                        '</small>' .
+                                   '</li>';
+
+                endwhile;
+                
+                $html .= '<ul>' . $post_links . '</ul>';
+
+            else:
+            
+                $html .= '<div class="error"><p>' . __( 'Nothing found.', 'cbach-wp-gridster') . '</p></div>';                
+            
+            endif;
+
+            $html .= '<div class="widget-block-paginav">';
+                $html .= '<button type="button" class="alignleft button-secondary get-previous-posts widget-blocks-pagination" data-search="' .  $s . '" data-paged="' .  $paged_prev . '" ' . ( ( $paged_prev < 1 || $paged_prev == $paged ) ? 'disabled="disabled"' : '' ) . ' title="'. sprintf( __( 'Get previous %s', 'cbach-wp-gridster' ), $pt->labels->name ) .'">&laquo;</button>';                
+                $html .= '<input type="text" class="'. $this->prefix.'search-posts-by-type" name="'. $this->prefix.'search-posts-by-type" placeholder="'.__( 'Search', 'cbach-wp-gridster' ).'" value="'.$s.'" data-paged="' .  $paged . '" title="' . __( 'Type searchterm  & wait 2 seconds', 'cbach-wp-gridster' ) .'">';
+                $html .= '<button type="button" class="alignright button-secondary get-next-posts widget-blocks-pagination" data-search="' .  $s . '" data-paged="' . $paged_next . '" ' . ( ( $paged_next > $gridster_last->max_num_pages || $paged_next == $paged ) ? 'disabled="disabled"' : '' ) . ' title="'. sprintf( __( 'Get next %s', 'cbach-wp-gridster' ), $pt->labels->name ) .'">&raquo;</button>';
+            $html .= '</div>';
+
+            wp_reset_query();  
+            
+            echo $html;
+            
+            die();
+        } 
+        
+        
+                
 /***************************************************************************************************************************************************************************************************
  *
  *  FILTERS
@@ -1453,6 +1555,84 @@ global $post;
         }
         
         
+
+        /**
+         *  Load TinyMCE Plugin for 
+         *  visual replacement of shortcode inside the editor
+         *  
+         *  @since    1.1
+         *  
+         *  @param    array   all loaded TinyMCE plugins
+         *  
+         *  @return   array   all loaded TinyMCE plugins
+         *  
+         */                                                                                 
+        public function mce_external_plugins ( $plugin_array ) {
+#            $plugin_array['gridster_shortcode'] = plugins_url( '/tinymce/tinymce_gridster_shortcode_plugin.js', __FILE__ );      
+            // for debug only
+            $date = new DateTime();
+            $plugin_array['gridster_shortcode'] = plugins_url( '/tinymce/tinymce_gridster_shortcode_plugin.js?cache=' . $date->getTimestamp(), __FILE__ );
+            return $plugin_array;
+        }
+        
+        
+        
+        /**
+         *  Load editor style into TinyMCE 
+         *  containing CSS for our graphical shortcode replacement
+         *  
+         *  @since    1.1
+         *  
+         *  @param    array   tinymce options
+         *  
+         *  @return   array   updated tinymce options with new editor styles appended
+         *  
+         */                                                                              
+        public function tiny_mce_before_init ( $editor_styles ) {
+#            $editor_styles['content_css'] .= ',' . plugins_url( '/css/gridster_shortcode_editor-style.'.$this->minified_css_files.'css' , __FILE__ );
+            // for debug only
+            $date = new DateTime();
+            $editor_styles['content_css'] .= ',' . plugins_url( '/css/gridster_shortcode_editor-style.css?cache=' . $date->getTimestamp() , __FILE__ );
+            return $editor_styles;        
+        }
+        
+        
+        
+        /**
+         *  Registers TinyMCE Button
+         *  
+         *  @since    1.1
+         *  
+         *  @param    array   tinymce buttons
+         *  
+         *  @return   array   updated tinymce buttons including "Insert Gridster" Button
+         *  
+         */                                        
+        public function mce_buttons ( $buttons ) {
+          	// inserts a separator between existing buttons and our new one
+          	array_push( $buttons, '|', 'gridster_shortcode' );
+          	return $buttons;
+        }
+        
+        
+
+
+        /**
+         *  TinyMCE Plugin Localization
+         *  
+         *  @since    1.1                  
+         *
+         *  @see      http://dnaber.de/blog/2012/wordpress-tinymce-plugin-mit-dialogbox/
+         *  @param    array     external languages files per Plugin
+         *           
+         *  @return   array     updated external languages files per Plugin
+         *           
+         */
+        public function mce_external_languages( $mce_external_languages ) {
+          	$mce_external_languages[ 'gridster_shortcode' ] = plugin_dir_path( __FILE__ ) . 'tinymce/i18n/mce_locale.php';
+          	return $mce_external_languages;
+        }
+
         
 /***************************************************************************************************************************************************************************************************
  *

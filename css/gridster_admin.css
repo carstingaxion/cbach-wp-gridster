@@ -7,7 +7,8 @@
 #adminmenu #menu-posts-gridster div.wp-menu-image,
 #icon-edit.icon32-posts-gridster,
 .gridster_edit:before,
-.gridster_edit-area:before {
+.gridster_edit-area:before,
+.wp_themeSkin .mceIcon.mce_gridster_shortcode {
     background-image: url('../images/gridster_sprite.png');
     background-repeat: no-repeat;
 }
@@ -25,6 +26,43 @@
 #icon-edit.icon32-posts-gridster {
     background-position: 0 -114px;
 }
+.wp_themeSkin .mceIcon.mce_gridster_shortcode {
+    background-position: 2px -46px;
+}
+.wp_themeSkin .mceIcon.mce_gridster_shortcode:hover,
+.wp_themeSkin .mceIcon.mce_gridster_shortcode:active,
+.wp_themeSkin .mceIcon.mce_gridster_shortcode:focus {
+    background-position: 2px -75px;
+}
+
+/******************************************************************************************************************
+ *  TINYMCE Edit & Delete Handler Buttons
+ ******************************************************************************************************************/
+#gridster_sr_btns {
+	padding: 2px;
+	position: absolute;
+	display: none;
+	z-index: 155000;
+}
+    #gridster_changeShortcode,
+    #gridster_editShortcode,
+    #gridster_delShortcode {
+    	border-color: #999;
+    	background-color: #eee;
+    	margin: 2px;
+    	padding: 2px;
+    	border-width: 1px;
+    	border-style: solid;
+    	-webkit-border-radius: 3px;
+    	border-radius: 3px;
+    }
+    
+    #gridster_changeShortcode:hover,
+    #gridster_editShortcode:hover,
+    #gridster_delShortcode:hover {
+    	border-color: #555;
+    	background-color: #ccc;
+    }
 
 /*********************************************************************************************************************************************
  *  CPT Gridster edit.php 
@@ -107,7 +145,9 @@
     }
         .gridster_widget-block {
             margin-bottom: 1em;
+            position: relative;
             border: 1px solid #DFDFDF;
+            background-color: whitesmoke;
             -webkit-border-radius: 3px;
                     border-radius: 3px;
             -webkit-background-clip: padding-box; 
@@ -132,6 +172,9 @@
             display: none;
             padding: 0;
         }
+            .gridster_widget-block .inside div.error {
+                margin: 10px;
+            }            
             .gridster_widget-block .inside li {
                 clear: both;
                 margin: 0;
@@ -139,7 +182,7 @@
             }
             .gridster_widget-block .inside li:hover {
                 cursor: move;
-                background-color: #F8F8F8; 
+                background-color: #fff; 
             }
                 .gridster_widget-block .inside li span {
                     display: inline-block;
@@ -171,8 +214,28 @@
                 .gridster_widget-block .inside li.ui-draggable-dragging small.howto {
                     display: none;
                 }                        
-           
-
+            .gridster_widget-block .inside .widget-block-paginav {
+                height: 30px;
+                padding: 0 10px;
+                position: relative;
+            }
+            .gridster_widget-block .inside .widget-block-paginav .gridster_search-posts-by-type {
+                display: block;
+                left: 20%;
+                position: absolute;
+                top: 0;
+                width: 60%;          
+            }
+            .gridster_widget-block .spinner {
+                background-position: 50%;
+                left: 0;
+                position: absolute;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                background-color: rgba(255,255,255,.5);           
+            }
 
 /*********************************************************************************************************************************************
  *  CPT Gridster post.php - METABOX right column with gridster.js workbench
@@ -322,7 +385,7 @@
                 opacity: 1;
             }            
             .gridster li .meta-label span.move-handle {
-                background-position: 0 0;
+                background-position: 0 -1px;
             } 
             .gridster li .meta-label span.delete-post {
                 background-position: 0 -22px;                
@@ -361,10 +424,10 @@
     .gridster_edit-area form textarea {
         line-height: 1em;
         margin: 0;
-        max-width: 95%;
+        width: 100%;
         padding: 2px 1px;
         min-height: 1em;
-        resize-x: none;
+        resize: vertical;
     }
     .gridster .gridster_edit-area form button {
         margin: 5px 5px 0 0;

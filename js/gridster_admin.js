@@ -160,20 +160,7 @@ jQuery(function($){
     }).data('gridster');
 
     
-                                 
-    /**
-     *  Make <li>s inside the left column widget blocks draggable
-     *  and make them jump back to origin, when not dropped to gridster
-     *  
-     *  @since    1.0
-     *  
-     */                             
-    $( '.gridster_widget-block li' ).draggable({
-        revert: 'invalid',
-    });
-    
-    
-    
+                                   
     /**
      *  Setup the 'gridster' as a drop-area for post-<li>-s from widget-blocks
      *  and call the getter for the new widgets HTML     
@@ -463,23 +450,6 @@ $(".gridster li .admin-html-holder a")
     });
     
 
-    /**
-     *  Make all loaded gridster-widgets resizable
-     *  and add UI elements     
-     *  
-     *  @since    1.0
-     *  
-                        
-    $( '.gridster li' ).each( function( ) {
-
-        //
-        $(this).resizable( resizable_opts );
-        
-        // add UI elements to handle widget
-        $(this).append( $.fn.AddUiElemnts( ) );
-    }); 
-     */    
-
 
     /**
      *  Make content editable
@@ -557,7 +527,18 @@ $(".gridster li .admin-html-holder a")
                 $.fn.updateGridsterLayoutSettings();      
              }               
          });    
-                
+        
+        
+        /**
+         *  Add WordPress UI default styles to Jeditable form buttons
+         *  
+         *  @since    1.0
+         *  
+         */
+        $('.gridster_edit-area').on( 'click', function(){
+            $('button[type="submit"]').addClass('button-primary');
+            $('button[type="cancel"]').addClass('button-secondary');         
+        });
      }
      $.fn.initJeditable();
      
@@ -674,7 +655,118 @@ $(".gridster li .admin-html-holder a")
         } 
     }
 
-}); 
+
+
+    /**
+     *  Get Posts by type to display lists inside wthe widegt-blocks
+     *  
+     *  @since    1.1          
+     *  
+     */ 
+    $.fn.getPostsByType = function( post_type, paged,  search = null ) {
+
+        // prepare options Array 
+        var query_options = {
+            
+            // 
+            post_type:  post_type,
+            
+            //
+            paged: paged,
+            
+            //
+            search: search,
+        };
+    
+        // get HTML 
+        $.ajax({
+            type: 'GET',
+            url: gridster_admin.ajaxUrl,
+            dataType: 'html',
+            data: ({ 
+                // callback function, /plugins/cbach-wp-gridster/cbach-wp-gridster.php
+                action: 'ajax_get_posts_by_type_widget_block',
+                // security checking, Nonce
+                nonce:    gridster_admin.ajaxNonce,
+                // content options
+                options: query_options,
+                //
+                post: $('#post_ID').val() 
+            }),
+            success: function( data ){
+    
+                // no data
+                if ( data == '-1' || data == '' || data == '0' || data == 'undefined' ) {
+                
+                    var error_msg = $('<p />').text( gridster_admin.textAjaxNothingFound );
+                    error_msg = $('<div />').addClass('error').append(error_msg);
+                    $('#gridster_post_type-' + post_type + '-widget-block').find('.inside').html( error_msg );                    
+                
+                } else {
+                   
+                    $('#gridster_post_type-' + post_type + '-widget-block').find('.inside').html( data );
+                    
+                    
+                    /**
+                     *  Make <li>s inside the left column widget blocks draggable
+                     *  and make them jump back to origin, when not dropped to gridster
+                     *  
+                     *  @since    1.0
+                     *  
+                     */                             
+                    $( '.gridster_widget-block li' ).draggable({
+                        revert: 'invalid',
+                    });   
+                }
+                
+                // hide spinner on success
+                $('#gridster_post_type-' + post_type + '-widget-block').find('.spinner').hide();                
+            }
+        }); 
+    };
+    // load lists of all post_types on load
+    $('.gridster_widget-block').each( function(  ) {
+        var post_type = $(this).data('post_type');
+        $.fn.getPostsByType( post_type, paged = 1 );
+    });
+    // load paged list of posts on paging-click
+    $(document).on( 'click', '.widget-blocks-pagination', function(){
+        $(this).parentsUntil('.gridster_widget-block').parent().find('.spinner').show();
+        var post_type = $(this).parentsUntil('.gridster_widget-block').parent().data('post_type');
+        var paged =  $(this).data('paged');
+        var search = ( $(this).data('search') ) ? $(this).data('search') : null;  
+        $.fn.getPostsByType( post_type, paged = paged, search );    
+    });
+    // load search-list of posts
+    //setup before functions
+    //timer identifier
+    var typingTimer;
+    //time in ms, 2 second for example                
+    var doneTypingInterval = 2000;  
+    
+    //on keyup, start the countdown
+    $(document).on( 'keyup', '.gridster_search-posts-by-type', function(){
+        var input = $(this);    
+        typingTimer = setTimeout( function() { $.fn.doneTyping( input ) }, doneTypingInterval);
+    });
+    
+    //on keydown, clear the countdown 
+    $(document).on( 'keydown', '.gridster_search-posts-by-type', function(){
+        clearTimeout(typingTimer);
+    });
+    
+    //user is "finished typing," get our SERP
+    $.fn.doneTyping = function( input ) {
+        input.parentsUntil('.gridster_widget-block').parent().find('.spinner').show();
+        var post_type = input.parentsUntil('.gridster_widget-block').parent().data('post_type');
+        var paged =  input.data('paged');
+        var search = $.trim( input.val() );
+        $.fn.getPostsByType( post_type, paged = paged, search );   
+    }                
+     
+    
+    
+});  // end // jQuery(function($){  
 
 
 
@@ -733,14 +825,6 @@ jQuery(document).ready(function($) {
     // initial load all widgets from DB     
     $.fn.LoadWidgetsOnStart();
     
-    // update layout settings 
-    // back into the hidden input, 
-    // because PHP returns unescaped HTML into the input on load
-    // and if we save two times, without doing changes we'll get 
-    // some HTML mess
-    //$.fn.updateGridsterLayoutSettings();     
-    
-    
     
     /**
      *  Test if workbench is wide enough to fit $content_width
@@ -777,20 +861,6 @@ jQuery(document).ready(function($) {
 
 
 
-    /**
-     *  Add WordPress UI default styles to Jeditable form buttons
-     *  
-     *  @since    1.0
-     *  
-     */                    
-    $('.gridster_edit-area').on( 'click', function(){
-        // use timeout, to make sure all layout changes are applied
-        setTimeout(function(){
-               $('button[type="submit"]').addClass('button-primary');
-               $('button[type="cancel"]').addClass('button-secondary');                  
-        },1);
-    }); 
-    
     // toggle Class on Jeditable elements when edited
     $('.gridster_edit, .gridster_edit-area').click( function() {
         if ( $(this).hasClass( 'isEdited' ) ) {
@@ -806,5 +876,8 @@ jQuery(document).ready(function($) {
             $(this).parent().parent().removeClass( 'isEdited' );        
         } 
     });
-*/               
+*/   
+
+
+            
 });
