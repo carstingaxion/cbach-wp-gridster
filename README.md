@@ -1,12 +1,12 @@
 # Gridster #
 **Contributors:** 			carstenbach  
 **Donate link:** 				https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XHR4SXESC9RJ6  
-**Tags:** 							GUI, gridster, layout management, drag & drop, grid, multi-column, columns  
+**Tags:** 							GUI, gridster, layout management, drag & drop, grid, multi-column, columns, user-friendly, shortcode  
 **Author URI:**       	http://carsten-bach.de  
 **Author:**            	Carsten Bach  
 **Requires at least:** 	3.3  
 **Tested up to:** 			3.5.1  
-**Stable tag:** 				1.0  
+**Stable tag:** 				1.1  
 **License:**            GPLv2 or later  
 **License URI:**        http://www.gnu.org/licenses/gpl-2.0.html  
 
@@ -32,6 +32,8 @@ You can [fork Gridster at Github](https://github.com/carstingaxion/cbach-wp-grid
 *  add gridsters by simply adding a generated shortcode, you'll get from the gridsters post-list 
 *  this plugin recognizes your defined content width from your theme and will help you create best fitting gridsters
 *  scripts & styles are loaded only if shortcode is really used, this saves load time
+*  visual shortcode replacement, like you know from [gallery]-Shortcode
+*  TinyMCE Button to add gridster layouts with user-friendly GUI
 
 
 ### Templates ###
@@ -111,6 +113,14 @@ Drop me a line at gridster@carsten-bach.de
 
 ## Changelog ##
 
+### 1.1 ###
+* Added TinyMCE Button to add shortcode
+* Added visual shortcode replacement inside the editor, similar to the gallery-shortcode, with handle-buttons for changing the current shortcode, editing the related gridster and deleting the shortcode from the content
+* Added Pagination to post-lists available as gridster-widgets
+* Added Search to post_type blocks, to look for posts (and pages and custom post_types) usable as gridster-widgets
+* Updated german translation
+* Updated Icons
+
 ### 1.0 ###
 * Initial release
 
@@ -124,4 +134,8 @@ Drop me a line at gridster@carsten-bach.de
 
 * The guys of [Ducksboard](http://ducksboard.com/) and the many github Contributors for their work on [gridster.js](https://github.com/ducksboard/gridster.js)
 * [Mika Tuupola](http://www.appelsiini.net/) for his work on [Jeditable](http://www.appelsiini.net/projects/jeditable)
-* [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/) for his [Diagona Icons](http://www.iconfinder.com/iconsets/diagona) licensed under [Creative Commons (Attribution 3.0 Unported)](http://creativecommons.org/licenses/by/3.0/) 
+* [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/) for his [Diagona Icons](http://www.iconfinder.com/iconsets/diagona) licensed under [Creative Commons (Attribution 3.0 Unported)](http://creativecommons.org/licenses/by/3.0/)
+* [MidTone Design](http://www.midtonedesign.com/portfolio/category/portfolio/) for their [Web Injection Icons)[http://www.iconfinder.com/iconsets/webinjection]
+* [Dmitry Costenco](http://www.aha-soft.com/) for his [Free Applications Icons](http://www.iconfinder.com/iconsets/freeapplication)
+* [New Moon](http://code.google.com/u/newmooon/) for their [Ultimate Gnome Icons](http://www.iconfinder.com/iconsets/UltimateGnome)
+
