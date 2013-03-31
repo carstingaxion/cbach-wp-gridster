@@ -75,7 +75,7 @@
  
  
 /*********************************************************************************************************************************************
- *  CPT Gridster post.php - METABOX common UI
+ *  CPT Gridster post.php - workbench METABOX common UI
  ********************************************************************************************************************************************/
 #gridster_workbench_metabox {
     background: none;
@@ -436,6 +436,61 @@
         height: 22px;
         line-height: 21px;    
     }
+
+
+ 
+/*********************************************************************************************************************************************
+ *  CPT Gridster post.php - options METABOX common UI
+ ********************************************************************************************************************************************/
+#gridster_options_metabox label.short-text-integer {
+    display: block;
+    position: relative;
+    padding-right: 23px;
+}
+    #gridster_options_metabox label.short-text-integer:after {
+        position: absolute;
+        top: 0;
+        right:0;
+        width: 20px;
+        color: #666;
+        content: 'px';
+    }    
+    #gridster_options_metabox input.short-text-integer {
+        width: 40px;
+        text-align: right;
+        position: relative;
+        margin-top: -3px;
+    }    
+   
+   
+    
+/******************************************************************************
+ * TINYMCE MODAL
+/******************************************************************************/
+
+#gridster_modal-content {
+    font-family: sans-serif;
+    font-size: 12px;
+    line-height: 1.4em;
+    color: #333333;
+    background-color: #F5F5F5;
+}
+    #gridster_modal-content p {
+        margin: .25em 0 .75em;
+    }
+    #gridster_modal-content a:link,
+    #gridster_modal-content a:visited {
+        color: #21759B;
+    }
+    #gridster_modal-content a:hover, 
+    #gridster_modal-content a:focus, 
+    #gridster_modal-content a:active {
+        color: #D54E21;
+    }
+    #gridster_modal-content div.error {
+        margin: 3.5em 10%;
+    }
+
 
 
 /******************************************************************************

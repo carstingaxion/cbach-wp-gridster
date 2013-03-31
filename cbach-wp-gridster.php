@@ -122,7 +122,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @type  array
          */
       	protected $thumbnail_filter_dimensions = array(); 
-               
+        
+        
         /**
          *  Construct the CLASS
          *  
@@ -145,6 +146,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
 		        // get settings
             add_action( 'init', array( &$this, 'load_settings' ) );
             
+            // check if there are any existing gridster posts
+            add_action( 'init', array( &$this, 'have_gridster_posts' ) );
+            
+            wp_delete_post( '8016' );
         }
       
       
@@ -181,12 +186,16 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         /**
       	 *   Run during the uninstallation of the plugin
       	 *   
-      	 *   Delete all 'gridster' posts and its post_meta 
+      	 *   Delete all 'gridster' posts, its post_meta and plugin options 
       	 *   
       	 *   @since    1.0                                    
       	 *   
       	 */                  
       	public function uninstall() {
+            
+            // important: check if the file is the one that was registered with the uninstall hook (function)
+            if ( __FILE__ != WP_UNINSTALL_PLUGIN )
+                return;
             
             $all_gridsters = get_posts( array( 
                 'posts_per_page'=> -1,
@@ -245,11 +254,17 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 // whitelist plugin options
             		add_action( 'admin_init', array( &$this, 'settings_register_general' ) );
                 
+                // redirect to edit.php to post-new.php, when there are no existing gridster posts
+            		add_action( 'admin_init', array( &$this, 'redirect_edit_to_post_new_when_no_posts_exist' ) );                
+                
                 // get current screen object as early as possible
                 add_action( 'current_screen', array( &$this, 'current_screen' ) );
                
                 // save gridster post_metas 
-                add_action( 'save_post', array( &$this, 'save_post' ) ); 
+                add_action( 'save_post', array( &$this, 'save_post' ) );
+                
+                // dlete gridster post_metas on post deletion 
+                add_action( 'delete_post', array( &$this, 'delete_post' ) );                
                 
                 // show customized "updated" messages
                 add_filter( 'post_updated_messages', array( &$this, 'post_updated_messages' ) );                          
@@ -304,7 +319,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             add_filter( 'post_thumbnail_size', array( &$this, 'filter_image_size_on_ajax_request' ) );            
             
       	}
-
+       
 
             
         /**
@@ -516,7 +531,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 #'capabilities' => array(),
                 #'map_meta_cap' => false,
                 'hierarchical' => false,                  
-                'supports' => array( 'title', 'revisions', 'author' ),
+#                'supports' => array( 'title', 'revisions', 'author' ),
+                'supports' => array( 'title', 'author' ),
                 'register_meta_box_cb' =>  array( &$this, 'add_meta_boxes' ),   
                 #'taxonomies' => array(),                
                 'has_archive' => false,
@@ -566,6 +582,27 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         }
 
 
+
+        /**
+         *  Redirects edit.php to post-new.php if no gridster posts exist
+         *  
+         *  @since    1.1
+         *  
+         */                                            
+        public function redirect_edit_to_post_new_when_no_posts_exist ( ) {
+        
+            global $pagenow;
+            
+            // ok, we do have some posts saved yet
+            if( $this->default_settings['have_gridster_posts'] )
+                return;
+        
+            // Check current admin page
+            if( $pagenow == 'edit.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] == $this->cpt_gridster ){
+                wp_redirect( admin_url('/post-new.php?post_type=' . $this->cpt_gridster, 'http'), 302 );
+                exit;
+            } 
+        }
 /***************************************************************************************************************************************************************************************************
  *
  *  ADMIN UI
@@ -786,18 +823,44 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          */
         public function gridster_options_meta_box ( $post, $meta_box ) {
 
-            echo '<p class="howto">' . __( 'Override the default options for this gridster', 'cbach-wp-gridster' ) . '</p>';
+            echo '<p class="howto">' . __( 'Override the default options for this gridster.', 'cbach-wp-gridster' ) . '</p>';
 
-            foreach ( $this->post_settings['dimensions'] as $name => $value ) {
-                $id =  esc_attr( '_gridster_dimensions-'.$name );
-                $name = esc_attr( '_gridster_dimensions['.$name.']' );
+            // all general settings, we'll let the editor overwrite 
+            $plugable_options = array(
+                'widget_margin_x' => $this->post_settings['dimensions']['widget_margin_x'],
+                'widget_margin_y' => $this->post_settings['dimensions']['widget_margin_y'],                
+                'widget_base_width' => $this->post_settings['dimensions']['widget_base_width'],                
+                'widget_base_height' => $this->post_settings['dimensions']['widget_base_height'],
+            );
+            
+            foreach ( $plugable_options as $name => $value ) {
+                // description of label element
+                switch ( $name ) {
+                    case 'widget_margin_x' :
+                        $label = __( 'horizontal margin', 'cbach-wp-gridster' );
+                        break;
+                    case 'widget_margin_y' :
+                        $label = __( 'vertical margin', 'cbach-wp-gridster' );
+                        break;
+                    case 'widget_base_width' :
+                        $label = __( 'widgets base width', 'cbach-wp-gridster' );
+                        break;
+                    case 'widget_base_height' :
+                        $label = __( 'widgets base height', 'cbach-wp-gridster' );
+                        break;
+                }
+                // element id for input and label
+                $id =  esc_attr( $this->prefix . 'dimensions-'.$name );
+                // name of option to save the value to
+                $name = esc_attr( $this->prefix . 'dimensions['.$name.']' );
+                // escape field value
                 $value = esc_attr( $value );
-                echo '<label for="'.$id.'">'.$name.'</label>';
-                echo '<input type="text" id="'.$id.'" name="'.$name.'" value="'.$value.'" class="short-text" />';              
+                echo '<p><label for="'.$id.'" class="short-text-integer">'.$label;
+                echo '<input type="number" id="'.$id.'" name="'.$name.'" value="'.$value.'" class="short-text short-text-integer alignright" /></label></p>';              
             }  
         }
         
-        
+
                 
         /**
          *  Get list of all post_types used as widget-blocks
@@ -830,6 +893,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         protected function get_default_settings () {
             return array(
               'version' => $this->version,
+              'have_gridster_posts' => false,
               'widget_margin_x'  =>  10,
               'widget_margin_y'  =>  10,
               'widget_base_width' => 150,
@@ -846,6 +910,36 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         }
 
 
+
+        /**
+         *  Check for the existence of any gridster posts
+         *  and sets proper option to default_settings         
+         *  
+         *  @used in 
+         *  - redirect_edit_to_post_new_when_no_posts_exist() 
+         *  - and admin_menu()
+         *  
+         *  @since    1.1
+         *  
+         */                                                              
+        public function have_gridster_posts ( ) {
+        
+            // ok, we do have some posts saved yet
+            if( $this->default_settings['have_gridster_posts'] )
+                return;
+                
+            // look for existing posts
+            $have_posts = get_posts( array( 'post_type' => $this->cpt_gridster, 'posts_per_page' => -1, 'post_status' => 'any' ) );
+            
+            // update plugin options, if we've posts
+            if ( !empty( $have_posts ) ) {
+                $this->default_settings['have_gridster_posts'] = true;
+                update_option( $this->default_settings_name, $this->default_settings );
+            }
+        }
+
+
+
         /**
          *   Loads general settings 
          *   
@@ -854,7 +948,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   
          *   @since    1.0    
          *   
-         *   @todo     improve fn(), like http://wordpress.stackexchange.com/a/49797                       
+         *   @todo     improve fn(), like http://wordpress.stackexchange.com/a/49797
+         *   @todo     maybe add check for required WP Version, like http://www.presscoders.com/2011/11/deactivate-wordpress-plugin-automatically/                                
          */
         public function load_settings() {
           	
@@ -899,13 +994,12 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             $this->post_settings['layout'] = get_post_meta( $post_id, '_gridster_layout', true );
             
             // get dimensions of this gridster
-            $dimensions = ( $dims = get_post_meta( $post_id, '_gridster_dimensions' ) ) ? $dims : array(); 
+            $dimensions = ( $dims = get_post_meta( $post_id, '_gridster_dimensions', true ) ) ? $dims : array(); 
             $this->post_settings['dimensions'] = array_merge( $this->default_settings, $dimensions );            
             
             // get used post->IDs within this gridster
             $not_in = get_post_meta( $post_id, '_gridster_query_posts_not_in', true );
             $this->post_settings['query_posts_not_in'] = ( !empty( $not_in ) ) ? explode( ',', $not_in ) : array( 0 );
-            
         }
         
         
@@ -917,13 +1011,21 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                        
         public function admin_menu () {
-        	 add_options_page(
-              __( 'Gridster Default Options', 'cbach-wp-gridster' ),
-              _x( 'Gridster', 'title of options page', 'cbach-wp-gridster' ),
-              'manage_options',
-              $this->default_settings_slug,
-              array( &$this, 'settings_page' )
-          );
+             // Add Settings page to default Settings Menu
+          	 add_options_page(
+                __( 'Gridster Default Options', 'cbach-wp-gridster' ),
+                _x( 'Gridster', 'title of options page', 'cbach-wp-gridster' ),
+                'manage_options',
+                $this->default_settings_slug,
+                array( &$this, 'settings_page' )
+            );
+            
+            // do we have gridster posts yet
+            if( $this->default_settings['have_gridster_posts'] )
+                return;
+            
+            // remove "All Gridster" Page from "Gridster" post_type menu, if nothing can be shown there            
+            remove_submenu_page( 'edit.php?post_type=' . $this->cpt_gridster, 'edit.php?post_type=' . $this->cpt_gridster );
         }
         
         
@@ -1207,16 +1309,56 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             
             //sanitize user input
             $query_posts_not_in = sanitize_text_field( $_POST[$this->prefix.'query_posts_not_in'] );
-            $gridster_layout = sanitize_text_field( $_POST[$this->prefix.'layout'] );            
+            $gridster_layout = sanitize_text_field( $_POST[$this->prefix.'layout'] );
+            
+            $dimensions = array();            
+            foreach ( $_POST[$this->prefix.'dimensions'] as $k => $v ) {
+                // validate against Integers
+                $v = absint($v);
+                // compare to default settings 
+                if ( $v && ( $v != $this->default_settings[$k] ) )
+                    $dimensions[$k] = $v;
+            };            
             
             // save our data
             update_post_meta( $post_id, '_gridster_query_posts_not_in', $query_posts_not_in);
-            update_post_meta( $post_id, '_gridster_layout', $gridster_layout); 
+            update_post_meta( $post_id, '_gridster_layout', $gridster_layout);
+            if ( !empty( $dimensions ) )
+                update_post_meta( $post_id, '_gridster_dimensions', $dimensions );             
             
         }                                                                                   
 
 
 
+        /**
+         *  Delete post_meta if gridster post is deleted
+         *  
+         *  @since    1.1
+         *  
+         *  @param    Int   $post->ID of gridster, that should be deleted
+         *  
+         */                                                              
+        public function delete_post ( $post_id ) {
+            
+            // get post, to ckeck post_type
+            $post = get_post( $post_id );
+            
+            // only go on for gridster posts
+            if ( $post->post_type != $this->cpt_gridster )
+                return;
+                
+            // check if the current user is authorised to do this action.            
+            $pt = get_post_type_object( $this->cpt_gridster );
+            if ( ! current_user_can(  $pt->cap->edit_post , $post_id ) )
+                return;
+            
+            delete_post_meta( $post_id, '_gridster_layout' );
+            delete_post_meta( $post_id, '_gridster_query_posts_not_in' );
+            delete_post_meta( $post_id, '_gridster_dimensions' );                         
+        }
+        
+        
+        
         /**
          *  Add HTML attribute of "autocomplete='off'" to form element
          *  of post.php and edit.php for gridster post_types
@@ -1343,6 +1485,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         
         /**
          *  AJAX callback for TinyMCE modal
+         *           
          *  called from TinyMCE-Button-Click 
          *  or from the edit-handler-Button situated at a 
          *  visual replaced shortcode inside the editor
@@ -1353,11 +1496,80 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                 
         public function ajax_gridster_shortcode_update_modal ( ) {
-fb( get_posts( array( 'post_type' => 'gridster') ) );
-            echo '<div id="' . $this->prefix . 'modal-content">';
+
+            // verifies the AJAX request to prevent external processing requests  
+            check_ajax_referer( $this->nonce, 'nonce' );
+
+            // setup query arguments
+            $args = array( 
+                'post_type' => $this->cpt_gridster,
+                'orderby'=> 'title',
+                'order' => 'ASC',
+                'post_status' => 'publish',
+                'posts_per_page' => -1,                
+            );
             
-            echo '</div>';
-            die;
+            // get gridster posts as array of objects
+            $gridster = new WP_Query( $args );
+
+            // start output
+            echo '<html id="' . $this->prefix . 'modal-content">';
+            echo '<head>';
+            
+            // append CSS 
+            // for debug only
+            $date = new DateTime();
+#            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.css', __FILE__ ) . '">';
+            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . includes_url( '/js/tinymce/themes/advanced/skins/wp_theme/dialog.css?cache=' . $date->getTimestamp(), __FILE__ ) . '">';            
+            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.css?cache=' . $date->getTimestamp(), __FILE__ ) . '">';            
+            echo '<script language="javascript" type="text/javascript" src="' . plugins_url( '/tinymce/tinymce_gridster_shortcode_modal.js?cache=' . $date->getTimestamp(), __FILE__ ) . '" /></script>';            
+
+            echo '</head><body>';
+
+            // posts available ?
+            if( $gridster->have_posts() ) : 
+                
+                echo '<h2>' . __( 'Choose your Gridster to embed here.', 'cbach-wp-gridster' ) . '</h2>';
+                while ( $gridster->have_posts()) : $gridster->the_post();
+
+                    echo '<p>';
+                        echo '<label for="'.$this->prefix.'choose_shortcode_list_el-' . get_the_ID() . '">';
+                            echo '<input type="radio" name="' . $this->prefix . 'choose_shortcode_list" id="' . $this->prefix . 'choose_shortcode_list_el-' . get_the_ID() . '" value="' . esc_attr( '[' . $this->gridster_shortcode . ' id="' . get_the_ID() . '" title="' . get_the_title() . '"]' ) . '">';                
+                            echo get_the_title() . ' ';
+                            echo '<small class="modified-date howto alignright">'.
+                                     '<abbr title="' . sprintf(
+                                        __('Last edited by %1$s on %2$s at %3$s'), 
+                                        esc_html( get_the_modified_author() ), 
+                                        get_the_modified_date(), 
+                                        get_the_modified_date('H:i')
+                                        ) . 
+                                        '">' . get_the_modified_date('d.m.\'y') . 
+                                     '</abbr>'.
+                                 '</small>';                
+                        echo '</label>';                
+                    echo '</p>';                
+
+                endwhile;
+            
+            // no?, then give a hint
+            else:
+            
+                echo '<div class="error">';
+                    echo '<h2>' . __( 'No Gridster here, yet.', 'cbach-wp-gridster' ) . '</h2>';
+                    echo '<p>' . __( 'You do not have published any gridster.', 'cbach-wp-gridster' ) . '</p>';
+                    echo '<p>' . sprintf( 
+                        __( 'Go on and <a onclick="javascript:window.top.location.href=\'%1$s\'; return false; " href="%1$s" title="Go to the Gridster Edit Screen (will load a new page)">publish at least one</a>.', 'cbach-wp-gridster' ),
+                        admin_url( 'edit.php?post_type=' . $this->cpt_gridster ) 
+                        ) . '</p>';            
+                echo '</div>';
+                
+            endif;
+            
+            // end output
+            echo '</body></html>';
+            
+            // end AJAX properly
+            die();
         }
 
 
@@ -1644,23 +1856,34 @@ fb( get_posts( array( 'post_type' => 'gridster') ) );
 
          public function shortcode_render_gridster ( $atts ) {
             
-            // define this, to load scripts & styles accordingly
-            $this->shortcode_used = true;           
-            
             // extract working variables and fallback to defaults
             extract( shortcode_atts( array(
           		'id' => '',
               'title' => ''
           	), $atts ) );
 
-          	
+          	// abort if ID is not present 
+            if ( !$id || !absint( $id ) )
+                return;
+            
+            // you are not allowed to see ...
+            if ( ! $this->is_visible( $id ) )
+                return;
+            
             // load settings of this gridster
             $this->load_post_settings( $id );
             
+            // if post_meta exists and has layout value
+            if ( ! $layout = $this->post_settings['layout'] )
+                return;
+            
+            // define this, to load scripts & styles accordingly
+            $this->shortcode_used = true;   
+
             $output  = '<div class="gridster-wrap">'.
                        '<ul class="gridster">';
             
-            $widgets = json_decode( $this->post_settings['layout'] );
+            $widgets = json_decode( $layout );
             foreach ( $widgets as $widget ) {
                 $output .= '<li data-sizex="'.$widget->size_x.'" data-sizey="'.$widget->size_y.'" data-col="'.$widget->col.'" data-row="'.$widget->row.'" class="' . implode( ' ', get_post_class( '', $widget->id ) ) . '">';
                 $output .= html_entity_decode( $widget->html );
@@ -1724,6 +1947,36 @@ fb( get_posts( array( 'post_type' => 'gridster') ) );
         public function current_screen ( $current_screen ) {
             $this->current_screen = $current_screen;
         }
+        
+        
+        
+        /**
+         *  Conditional to check content visibility of given post
+         *  
+         *  @since    1.1
+         *  
+         *  @param    int     $post->ID
+         *  
+         *  @return   bool    wether the $post is visible to the user or not
+         *  
+         */
+        private function is_visible ( $post_id ) {
+        
+            //
+            $post = get_post( $post_id );
+            
+            // if public, everything is fine
+            if ( $post->post_status == 'publish' )
+                return true;
+            
+            // check if the current user is authorised to do this action.            
+            $pt = get_post_type_object( $post->post_type );
+            if ( current_user_can(  $pt->cap->edit_post , $post_id ) )
+                return true;
+                
+            // nothing matched, so hide this post    
+            return false;    
+        }                                                                                 
         
         
     } 
