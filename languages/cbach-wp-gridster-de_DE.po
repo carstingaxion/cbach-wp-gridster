@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: WP Gridster\n"
-"POT-Creation-Date: 2013-03-30 03:31+0100\n"
-"PO-Revision-Date: 2013-03-30 03:32+0100\n"
+"POT-Creation-Date: 2013-03-31 01:28+0100\n"
+"PO-Revision-Date: 2013-03-31 01:30+0100\n"
 "Last-Translator: Carsten Bach <mail@carsten-bach.de>\n"
 "Language-Team: Carsten Bach <mail@carsten-bach.de>\n"
 "Language: de_DE\n"
@@ -18,23 +18,23 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ./..\n"
 
-#: ../cbach-wp-gridster.php:349
+#: ../cbach-wp-gridster.php:364
 msgid "Move"
 msgstr "Verschieben"
 
-#: ../cbach-wp-gridster.php:350
+#: ../cbach-wp-gridster.php:365
 msgid "Delete"
 msgstr "Löschen"
 
-#: ../cbach-wp-gridster.php:351
+#: ../cbach-wp-gridster.php:366
 msgid "There was a problem loading your content, please try again."
 msgstr "Es gab ein Problem beim Laden des Inhalts, bitte versuch's nochmal."
 
-#: ../cbach-wp-gridster.php:352 ../cbach-wp-gridster.php:1441
+#: ../cbach-wp-gridster.php:367 ../cbach-wp-gridster.php:1640
 msgid "Nothing found."
 msgstr "Nichts gefunden."
 
-#: ../cbach-wp-gridster.php:353
+#: ../cbach-wp-gridster.php:368
 msgid ""
 "Maximum content width defined in your current theme by the variable "
 "$content_width."
@@ -42,133 +42,133 @@ msgstr ""
 "maximale Breite des Inhalts wie sie durch die Variable $content_width in "
 "Deinem Theme definiert wurde"
 
-#: ../cbach-wp-gridster.php:355
+#: ../cbach-wp-gridster.php:370
 msgid "Click to edit"
 msgstr "zum Bearbeiten klicken"
 
-#: ../cbach-wp-gridster.php:356
+#: ../cbach-wp-gridster.php:371
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: ../cbach-wp-gridster.php:357
+#: ../cbach-wp-gridster.php:372
 msgid "OK"
 msgstr "OK"
 
-#: ../cbach-wp-gridster.php:487 ../cbach-wp-gridster.php:488
-#: ../cbach-wp-gridster.php:659
+#: ../cbach-wp-gridster.php:502 ../cbach-wp-gridster.php:503
+#: ../cbach-wp-gridster.php:695
 msgid "Gridster"
 msgstr "Gridster"
 
-#: ../cbach-wp-gridster.php:489
+#: ../cbach-wp-gridster.php:504
 msgctxt "menu name"
 msgid "Gridster"
 msgstr "Gridster"
 
-#: ../cbach-wp-gridster.php:490
+#: ../cbach-wp-gridster.php:505
 msgid "All Gridster"
 msgstr "Alle Gridster"
 
-#: ../cbach-wp-gridster.php:491
+#: ../cbach-wp-gridster.php:506
 msgctxt "add new gridster"
 msgid "Add New"
 msgstr "Hinzufügen"
 
-#: ../cbach-wp-gridster.php:492
+#: ../cbach-wp-gridster.php:507
 msgid "Add New Gridster"
 msgstr "Neuen Gridster anlegen"
 
-#: ../cbach-wp-gridster.php:493
+#: ../cbach-wp-gridster.php:508
 msgid "Edit Gridster"
 msgstr "Gridster bearbeiten"
 
-#: ../cbach-wp-gridster.php:494
+#: ../cbach-wp-gridster.php:509
 msgid "New Gridster"
 msgstr "Neuer Gridster"
 
-#: ../cbach-wp-gridster.php:495
+#: ../cbach-wp-gridster.php:510
 msgid "View Gridster"
 msgstr "Gridster anzeigen"
 
-#: ../cbach-wp-gridster.php:496
+#: ../cbach-wp-gridster.php:511
 msgid "Search Gridster"
 msgstr "Gridster durchsuchen"
 
-#: ../cbach-wp-gridster.php:497
+#: ../cbach-wp-gridster.php:512
 msgid "No Gridster found"
 msgstr "Keine Gridster gefunden"
 
-#: ../cbach-wp-gridster.php:498
+#: ../cbach-wp-gridster.php:513
 msgid "No Gridster found in Trash"
 msgstr "Keine Gridster im Papierkorb"
 
-#: ../cbach-wp-gridster.php:499
+#: ../cbach-wp-gridster.php:514
 msgid "Parent Gridster:"
 msgstr "Übergeordnete Gridster:"
 
-#: ../cbach-wp-gridster.php:505
+#: ../cbach-wp-gridster.php:520
 msgid "Content arranged within a grid, powered by gridster.js"
 msgstr "Inhalte ausgerichtet in einem Raster, angetrieben von gridster.js"
 
-#: ../cbach-wp-gridster.php:554 ../cbach-wp-gridster.php:557
+#: ../cbach-wp-gridster.php:569 ../cbach-wp-gridster.php:572
 msgctxt "post_updated message"
 msgid "Gridster updated."
 msgstr "Gridster aktualisiert."
 
-#: ../cbach-wp-gridster.php:555
+#: ../cbach-wp-gridster.php:570
 msgid "Custom field updated."
 msgstr "Benutzerdefiniertes Feld aktualisiert."
 
-#: ../cbach-wp-gridster.php:556
+#: ../cbach-wp-gridster.php:571
 msgid "Custom field deleted."
 msgstr "Benutzerdefiniertes Feld gelöscht."
 
-#: ../cbach-wp-gridster.php:558
+#: ../cbach-wp-gridster.php:573
 #, php-format
 msgid "Gridster restored to revision from %s"
 msgstr "Gridster aus Überarbeitung vom %s wiederhergestellt"
 
-#: ../cbach-wp-gridster.php:559
+#: ../cbach-wp-gridster.php:574
 msgctxt "post_updated message"
 msgid "Gridster published."
 msgstr "Gridster veröffentlicht."
 
-#: ../cbach-wp-gridster.php:560
+#: ../cbach-wp-gridster.php:575
 msgid "Gridster saved."
 msgstr "Gridster gespeichert."
 
-#: ../cbach-wp-gridster.php:561
+#: ../cbach-wp-gridster.php:576
 msgctxt "post_updated message"
 msgid "Gridster submitted."
 msgstr "Gridster übertragen."
 
-#: ../cbach-wp-gridster.php:562
+#: ../cbach-wp-gridster.php:577
 #, php-format
 msgctxt "post_updated message"
 msgid "Gridster scheduled for: <strong>%1$s</strong>."
 msgstr "Gridster Veröffentlichung geplant für: <strong>%1$s</strong>."
 
-#: ../cbach-wp-gridster.php:562
+#: ../cbach-wp-gridster.php:577
 msgid "M j, Y @ G:i"
 msgstr "d. F Y H:i"
 
-#: ../cbach-wp-gridster.php:563
+#: ../cbach-wp-gridster.php:578
 msgctxt "post_updated message"
 msgid "Gridster draft updated."
 msgstr "Gridster Entwurf aktualisiert."
 
-#: ../cbach-wp-gridster.php:588 ../cbach-wp-gridster.php:643
+#: ../cbach-wp-gridster.php:624 ../cbach-wp-gridster.php:679
 msgid "Shortcode"
 msgstr "Shortcode"
 
-#: ../cbach-wp-gridster.php:669
+#: ../cbach-wp-gridster.php:705
 msgid "Gridster - Layout options"
 msgstr "Gridster - Layout-Einstellungen"
 
-#: ../cbach-wp-gridster.php:739
+#: ../cbach-wp-gridster.php:775
 msgid "Your content is being prepared as a gridster widget."
 msgstr "Dein Inhalt wird als Gridster Widget vorbereitet."
 
-#: ../cbach-wp-gridster.php:746
+#: ../cbach-wp-gridster.php:782
 #, php-format
 msgid ""
 "This application is usable only with <a href=\"%1$s\" target=\"_blank"
@@ -180,101 +180,128 @@ msgstr ""
 "title=\"Wie du Javascript in deinem Browser aktivierst\">Versuch's doch mal</"
 "a>!"
 
-#: ../cbach-wp-gridster.php:761
+#: ../cbach-wp-gridster.php:797
 msgid "Click to toggle"
 msgstr "zum Umschalten klicken"
 
-#: ../cbach-wp-gridster.php:789
-msgid "Override the default options for this gridster"
-msgstr "Überschreibe die Standardeinstellungen für diesen Gridster"
+#: ../cbach-wp-gridster.php:825
+msgid "Override the default options for this gridster."
+msgstr "Überschreibe die Standardeinstellungen für diesen Gridster."
 
-#: ../cbach-wp-gridster.php:921
+#: ../cbach-wp-gridster.php:839 ../cbach-wp-gridster.php:1124
+#: ../cbach-wp-gridster.php:1224
+msgid "horizontal margin"
+msgstr "horizontaler Außenabstand"
+
+#: ../cbach-wp-gridster.php:842 ../cbach-wp-gridster.php:1137
+#: ../cbach-wp-gridster.php:1235
+msgid "vertical margin"
+msgstr "vertikaler Außenabstand"
+
+#: ../cbach-wp-gridster.php:845 ../cbach-wp-gridster.php:1150
+#: ../cbach-wp-gridster.php:1246
+msgid "widgets base width"
+msgstr "Widget-Basis-Breite"
+
+#: ../cbach-wp-gridster.php:848 ../cbach-wp-gridster.php:1163
+#: ../cbach-wp-gridster.php:1257
+msgid "widgets base height"
+msgstr "Widget-Basis-Höhe"
+
+#: ../cbach-wp-gridster.php:1016
 msgid "Gridster Default Options"
 msgstr "Gridster Standard-Einstellungen"
 
-#: ../cbach-wp-gridster.php:922
+#: ../cbach-wp-gridster.php:1017
 msgctxt "title of options page"
 msgid "Gridster"
 msgstr "Gridster"
 
-#: ../cbach-wp-gridster.php:989
+#: ../cbach-wp-gridster.php:1091
 msgid "Default Options for all gridsters"
 msgstr "Standard-Einstellungen für alle Gridster"
 
-#: ../cbach-wp-gridster.php:1001
+#: ../cbach-wp-gridster.php:1103
 msgid "Default Options for all Gridsters"
 msgstr "Standard-Einstellungen für alle Gridster"
 
-#: ../cbach-wp-gridster.php:1009 ../cbach-wp-gridster.php:1111
+#: ../cbach-wp-gridster.php:1111 ../cbach-wp-gridster.php:1213
 msgid "Minimum number columns to create"
 msgstr "Minimal-Anzahl der zu erzeugenden Spalten"
 
-#: ../cbach-wp-gridster.php:1022 ../cbach-wp-gridster.php:1122
-msgid "horizontal margin"
-msgstr "horizontaler Außenabstand"
-
-#: ../cbach-wp-gridster.php:1035 ../cbach-wp-gridster.php:1133
-msgid "vertical margin"
-msgstr "vertikaler Außenabstand"
-
-#: ../cbach-wp-gridster.php:1048 ../cbach-wp-gridster.php:1144
-msgid "widgets base width"
-msgstr "Widget-Basis-Breite"
-
-#: ../cbach-wp-gridster.php:1061 ../cbach-wp-gridster.php:1155
-msgid "widgets base height"
-msgstr "Widget-Basis-Höhe"
-
-#: ../cbach-wp-gridster.php:1083
+#: ../cbach-wp-gridster.php:1185
 msgid "Enter the default layout-settings, used by every gridster."
 msgstr ""
 "Trage die Standardeinstellungen hier ein, die von jedem Gridster verwendet "
 "werden."
 
-#: ../cbach-wp-gridster.php:1084
+#: ../cbach-wp-gridster.php:1186
 msgid "You can alter theese settings for every gridster on its edit-page."
 msgstr "Du kannst diese Einstellungen für jeden Gridster einzeln abändern."
 
-#: ../cbach-wp-gridster.php:1111 ../cbach-wp-gridster.php:1122
-#: ../cbach-wp-gridster.php:1133 ../cbach-wp-gridster.php:1144
-#: ../cbach-wp-gridster.php:1155
+#: ../cbach-wp-gridster.php:1213 ../cbach-wp-gridster.php:1224
+#: ../cbach-wp-gridster.php:1235 ../cbach-wp-gridster.php:1246
+#: ../cbach-wp-gridster.php:1257
 msgid "You have entered an invalid value. Value must be of type: integer."
 msgstr ""
 "Du hast einen ungültigen Wert eingetragen. Werte sollten von der Art "
 "Ganzzahlen sein."
 
-#: ../cbach-wp-gridster.php:1425
+#: ../cbach-wp-gridster.php:1519
+msgid "Choose your Gridster to embed here."
+msgstr "Wähle den Gridster der hier angezeigt wird."
+
+#: ../cbach-wp-gridster.php:1528 ../cbach-wp-gridster.php:1624
 #, php-format
 msgid "Last edited by %1$s on %2$s at %3$s"
 msgstr "Zuletzt bearbeitet von %1$s am %2$s um %3$s"
 
-#: ../cbach-wp-gridster.php:1446
+#: ../cbach-wp-gridster.php:1545
+msgid "No Gridster here, yet."
+msgstr "Keine Gridster gefunden."
+
+#: ../cbach-wp-gridster.php:1546
+msgid "You do not have published any gridster."
+msgstr "Du hast bisher noch keine Gridster veröffentlicht."
+
+#: ../cbach-wp-gridster.php:1548
+#, php-format
+msgid ""
+"Go on and <a onclick=\"javascript:window.top.location.href='%1$s'; return "
+"false; \" href=\"%1$s\" title=\"Go to the Gridster Edit Screen (will load a "
+"new page)\">publish at least one</a>."
+msgstr ""
+"Du solltest <a onclick=\"javascript:window.top.location.href='%1$s'; return "
+"false; \" href=\"%1$s\" title=\"Zur Gridster Bearbeitungsansicht wechseln "
+"(wird eine neue Seite laden)\">wenigstens einen veröffentlichen</a>."
+
+#: ../cbach-wp-gridster.php:1645
 #, php-format
 msgid "Get previous %s"
 msgstr "Vorherige %s"
 
-#: ../cbach-wp-gridster.php:1447
+#: ../cbach-wp-gridster.php:1646
 msgid "Search"
 msgstr "Suche"
 
-#: ../cbach-wp-gridster.php:1447
+#: ../cbach-wp-gridster.php:1646
 msgid "Type searchterm  & wait 2 seconds"
 msgstr "Suchbegriff eingeben & 2 Sekunden warten"
 
-#: ../cbach-wp-gridster.php:1448
+#: ../cbach-wp-gridster.php:1647
 #, php-format
 msgid "Get next %s"
 msgstr "Nächste %s"
 
-#: ../cbach-wp-gridster.php:1499
+#: ../cbach-wp-gridster.php:1698
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: ../cbach-wp-gridster.php:1523
+#: ../cbach-wp-gridster.php:1722
 msgid "Report issues"
 msgstr "Fehler melden"
 
-#: ../cbach-wp-gridster.php:1524
+#: ../cbach-wp-gridster.php:1723
 msgid "Support"
 msgstr "Support"
 
@@ -291,8 +318,8 @@ msgid "Change which Gridster to show here."
 msgstr "Ändere welcher Gridster hier angezeigt wird."
 
 #: ../tinymce/i18n/mce_locale.php:15
-msgid "Edit this Gridster (opens a new window)"
-msgstr "Gridster bearbeiten (öffnet ein neues Fenster)"
+msgid "Edit this Gridster (will load a new page)"
+msgstr "Gridster bearbeiten (wird eine neue Seite laden)"
 
 #: ../tinymce/i18n/mce_locale.php:16
 msgid "Delete Gridster-Shortcode"
