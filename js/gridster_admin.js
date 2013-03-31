@@ -627,10 +627,10 @@ $(".gridster li .admin-html-holder a")
             // get all widget-blocks
             var widgets = $('.gridster_widget-block');
             // get the half, to know where to slice the list
-            var half = Math.floor( widgets.length/2 );
+            var half = Math.round( widgets.length/2 );
             // the wrap the first and the second half into divs
-            widgets.filter(function(i){ return i <= half; }).wrapAll('<div class="accordion-wrap" />');
-            widgets.filter(function(i){ return i > half; }).wrapAll('<div class="accordion-wrap" />');
+            widgets.filter(function(i){ return (i+1) <= half; }).wrapAll('<div class="accordion-wrap" />');
+            widgets.filter(function(i){ return (i+1) > half; }).wrapAll('<div class="accordion-wrap" />');
             // now trigger each first widget-block to expand
             //$('.accordion-wrap .gridster_widget-block:first h3').trigger('click');
         

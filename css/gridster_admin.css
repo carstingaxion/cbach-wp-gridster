@@ -68,7 +68,7 @@
  *  CPT Gridster edit.php 
  ********************************************************************************************************************************************/
 .gridster_shortcode-in-list-table {
-    min-width: 50%;
+    min-width: 75%;
     font-family: Consolas, monaco, monospace;
     border: none; 
 } 
