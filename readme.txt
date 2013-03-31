@@ -1,6 +1,6 @@
 === Gridster ===
 Contributors: 			carstenbach
-Donate link: 				https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XHR4SXESC9RJ6
+Donate link: 				https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=66FUUVCK9PFQJ
 Tags: 							GUI, gridster, layout management, drag & drop, grid, multi-column, columns, user-friendly, shortcode
 Author URI:       	http://carsten-bach.de
 Author:            	Carsten Bach
@@ -17,7 +17,7 @@ Use Gridster to manage your content with ease in a customizable grid.
 == Description ==
 Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 
-You can [fork Gridster at Github](https://github.com/carstingaxion/cbach-wp-gridster) or tell me about your [issues](https://github.com/carstingaxion/cbach-wp-gridster/issues).
+You can [fork Gridster at Github](https://github.com/carstingaxion/cbach-wp-gridster/fork) or tell me about your [issues](https://github.com/carstingaxion/cbach-wp-gridster/issues).
 
 
 = General - Features =
@@ -34,6 +34,7 @@ You can [fork Gridster at Github](https://github.com/carstingaxion/cbach-wp-grid
 *  scripts & styles are loaded only if shortcode is really used, this saves load time
 *  visual shortcode replacement, like you know from [gallery]-Shortcode
 *  TinyMCE Button to add gridster layouts with user-friendly GUI
+*  clean uninstall: all options, gridster-posts and related post-meta fields are deleted on uninstalling (not deactivation)
 
 
 = Templates =
@@ -47,6 +48,7 @@ By using the later described `gridster_locate_templates_from` filter you are abl
 
 
 = Inline editing =
+
 With help of the [Jeditable](http://www.appelsiini.net/projects/jeditable) library it is possible to edit loaded content directly inside the gridster workbench.
 So if you are using a post called "My grandmothers apple pie is the best", you could adjust the text inside your gridster-widget to shorter version, ie. "best apple pie" without editing the original post.
 Just add some CSS class to the wrapper element, where your title will appear.
@@ -56,6 +58,69 @@ If you want to edit texts in more comfortable textarea use `class="gridster_edit
 
 Have a look at the `/views/gridster-default.php` inside the plugin directory to get a clue. 
 
+
+
+
+
+== Installation ==
+
+1.  Extract the zip file
+2.  Drop the contents in the `wp-content/plugins/` directory of your WordPress installation
+3.  Activate the plugin from plugins page
+
+
+
+
+== Upgrade Notice ==
+
+
+
+
+
+== Frequently Asked Questions ==
+In the moment, there is no question I know about.
+
+Maybe you've some?!
+Drop me a line at gridster@carsten-bach.de
+
+
+
+
+== Screenshots ==
+
+1. Create a new Gridster by dragging your content from the Lists of your posttypes left to the workbench on the right. (with WordPress 3.5.1)
+2. Move the Gridster-Widgets around via drag & drop. Underlying Widgets are re-layoutet on the fly. (with WordPress 3.5.1)
+3. Resize the Gridster-Widgets and get updated Images directly inside the workbench. The Plugin looks for the best fitting size according to your defined Thumbnail-Image-Sizes. (with WordPress 3.5.1)
+4. After adding a new Gridster-Widget it is pre-populated with Title and Excerpt of the fetched post. Now you are able to inline edit theese texts, without the need to modify the original post. (with WordPress 3.5.1)
+5. You have two different types of inline-editors: input-fields and textareas. Define the editable content blocks by customizing the Gridster-Widget Templates within your Theme. (with WordPress 3.5.1)
+6. A list of all Gridster posts, also showing the Shortcodes. (with WordPress 3.5.1)
+7. An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the [gallery]-shortcode. (with WordPress 3.5.1) 
+
+
+
+
+
+== Changelog ==
+
+= 1.1 =
+* Added TinyMCE Button to add shortcode
+* Added visual shortcode replacement inside the editor, similar to the gallery-shortcode, with handle-buttons for changing the current shortcode, editing the related gridster and deleting the shortcode from the content
+* Added Pagination to post-lists available as gridster-widgets
+* Added Search to post_type blocks, to look for posts (and pages and custom post_types) usable as gridster-widgets
+* Updated german translation
+* Updated Icons
+* Clean post_metas on post deletion
+* Redirect Editor to workbench, if there are no gridster posts to show on /wp-admin/edit.php
+ 
+
+= 1.0 =
+* Initial release
+
+
+
+
+
+== Arbitrary section ==
 
 
 = Filters and Hooks =
@@ -71,62 +136,12 @@ Have a look inside the plugin file to see, what variables you are able to use wi
 
 
 
-= Languages =
+= Translations  =
 
 * English (en_US)
 * German (de_DE)
 
-
-
-== Installation ==
-
-1.  Extract the zip file
-2.  Drop the contents in the `wp-content/plugins/` directory of your WordPress installation
-3.  Activate the plugin from plugins page
-
-
-
-
-== Upgrade Notice ==
-There a no upgrade issues at the moment ;)
-
-
-
-
-== Frequently Asked Questions ==
-In the moment, there is no question I know about.
-
-Maybe you've some?!
-Drop me a line at gridster@carsten-bach.de
-
-
-
-
-== Screenshots ==
-1. 
-
-
-
-
-
-== Changelog ==
-
-= 1.1 =
-* Added TinyMCE Button to add shortcode
-* Added visual shortcode replacement inside the editor, similar to the gallery-shortcode, with handle-buttons for changing the current shortcode, editing the related gridster and deleting the shortcode from the content
-* Added Pagination to post-lists available as gridster-widgets
-* Added Search to post_type blocks, to look for posts (and pages and custom post_types) usable as gridster-widgets
-* Updated german translation
-* Updated Icons
-
-= 1.0 =
-* Initial release
-
-
-
-
-
-== Arbitrary section ==
+ 
 
 = Many Thanks goes out to =
 
