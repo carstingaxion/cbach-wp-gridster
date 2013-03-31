@@ -104,8 +104,8 @@ Drop me a line at gridster@carsten-bach.de
 ###6. A list of all Gridster posts, also showing the Shortcodes. (with WordPress 3.5.1)###
 ![A list of all Gridster posts, also showing the Shortcodes. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-6.jpg)
 
-###7. An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the gallery-shortcode. (with WordPress 3.5.1) ###
-![An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the gallery-shortcode. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-7.jpg)
+###7. An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the `[gallery]`-shortcode. (with WordPress 3.5.1) ###
+![An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the `[gallery]`-shortcode. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-7.jpg)
 
 
 
@@ -160,7 +160,7 @@ Have a look inside the plugin file to see, what variables you are able to use wi
 * The guys of [Ducksboard](http://ducksboard.com/) and the many github Contributors for their work on [gridster.js](https://github.com/ducksboard/gridster.js)
 * [Mika Tuupola](http://www.appelsiini.net/) for his work on [Jeditable](http://www.appelsiini.net/projects/jeditable)
 * [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/) for his [Diagona Icons](http://www.iconfinder.com/iconsets/diagona) licensed under [Creative Commons (Attribution 3.0 Unported)](http://creativecommons.org/licenses/by/3.0/)
-* [MidTone Design](http://www.midtonedesign.com/portfolio/category/portfolio/) for their [Web Injection Icons)[http://www.iconfinder.com/iconsets/webinjection]
+* [MidTone Design](http://www.midtonedesign.com/portfolio/category/portfolio/) for their [Web Injection Icons](http://www.iconfinder.com/iconsets/webinjection)
 * [Dmitry Costenco](http://www.aha-soft.com/) for his [Free Applications Icons](http://www.iconfinder.com/iconsets/freeapplication)
 * [New Moon](http://code.google.com/u/newmooon/) for their [Ultimate Gnome Icons](http://www.iconfinder.com/iconsets/UltimateGnome)
 
