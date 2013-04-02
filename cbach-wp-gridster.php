@@ -4,7 +4,7 @@ Plugin Name: 			Gridster
 Plugin URI:       https://github.com/carstingaxion/cbach-wp-gridster
 Description:      Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 Author:      			Carsten Bach
-Version: 					1.1
+Version: 					1.2
 Author URI:    		http://carsten-bach.de
 */
 
@@ -124,6 +124,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       	protected $thumbnail_filter_dimensions = array(); 
         
         
+        
         /**
          *  Construct the CLASS
          *  
@@ -148,8 +149,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             
             // check if there are any existing gridster posts
             add_action( 'init', array( &$this, 'have_gridster_posts' ) );
-            
-            wp_delete_post( '8016' );
         }
       
       
@@ -302,6 +301,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 // AJAX callback for TinyMCE modal, initiated by Button
                 add_action('wp_ajax_ajax_get_posts_by_type_widget_block', array( &$this, 'ajax_get_posts_by_type_widget_block' ) );
 
+
+                add_action('wp_ajax_ajax_get_textile_markup_for_jeditable', array( &$this, 'ajax_get_textile_markup_for_jeditable' ) );
             } else {
                 
                 // Render gridster Shortcode
@@ -312,6 +313,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 
                 // add scripts to frontend
                 add_action( 'wp_footer', array( &$this, 'print_js' ) );
+                
+                // add body_class
+                add_filter( 'body_class', array( &$this, 'body_class' ), 100, 1);
             
             }
             
@@ -603,6 +607,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 exit;
             } 
         }
+        
+        
+        
 /***************************************************************************************************************************************************************************************************
  *
  *  ADMIN UI
@@ -1445,7 +1452,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
 
 
         /**
-         *  get name of widget template form used theme
+         *  Get name of widget template form used theme
          *  or fallback to default plugin template 
          *  
          *  create a folder "/gridster-templates" 
@@ -1665,6 +1672,24 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             echo $html;
             
             die();
+        }
+        
+        
+        
+        public function ajax_get_textile_markup_for_jeditable () {
+            if ( !empty( $_POST['value'] ) ) {
+                $v = $_POST['value'];
+            } elseif( !empty( $_GET['value'] ) ) {
+                $v = $_GET['value'];            
+            } else {
+                die();            
+            }
+
+            
+            include_once '/libs/Textile.php';
+            $t = new Textile();
+            /* What is echoed back will be shown in webpage after editing.*/
+            echo $t->TextileThis( stripslashes( $v ) );        
         } 
         
         
@@ -1759,7 +1784,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                                                                      
         public function filter_image_size_on_ajax_request ( $size ) {
-
             if ( !empty( $this->thumbnail_filter_dimensions ) && defined( 'DOING_AJAX' ) && constant( 'DOING_AJAX' )  )
                 return $this->thumbnail_filter_dimensions;
             else
@@ -1844,6 +1868,27 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
           	$mce_external_languages[ 'gridster_shortcode' ] = plugin_dir_path( __FILE__ ) . 'tinymce/i18n/mce_locale.php';
           	return $mce_external_languages;
         }
+
+
+
+        /**
+         *  Add Body Class if Shortcode is found
+         *  
+         *  @since    1.2
+         *  
+         *  @param    array   body classes
+         *  
+         *  @return   array   updated body classes
+         *  
+         */                                                                                
+        function body_class( $classes ) {
+            global $post;
+            if (isset( $post->post_content ) && false !== stripos( $post->post_content, '[' . $this->gridster_shortcode ) ) {
+                array_push( $classes, 'gridster-not-loaded' );
+            }
+            return $classes;
+        }
+        
 
         
 /***************************************************************************************************************************************************************************************************
