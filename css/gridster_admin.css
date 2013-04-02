@@ -6,6 +6,7 @@
 .gridster li .meta-label span.move-handle,
 #adminmenu #menu-posts-gridster div.wp-menu-image,
 #icon-edit.icon32-posts-gridster,
+body.settings_page_gridster_default_options #icon-options-general,
 .gridster_edit:before,
 .gridster_edit-area:before,
 .wp_themeSkin .mceIcon.mce_gridster_shortcode {
@@ -23,7 +24,8 @@
 #adminmenu #menu-posts-gridster.wp-has-current-submenu div.wp-menu-image {
     background-position: 7px -71px;
 }
-#icon-edit.icon32-posts-gridster {
+#icon-edit.icon32-posts-gridster,
+body.settings_page_gridster_default_options #icon-options-general {
     background-position: 0 -114px;
 }
 .wp_themeSkin .mceIcon.mce_gridster_shortcode {
@@ -306,12 +308,6 @@
                         vertical-align: middle;
                         margin-right: 5px;
                     }        
-
-        #gridster_workbench,
-        #gridster_workbench_wrap noscript div,
-        #gridster_loader  {
-
-        }
         
         .gridster .content_width-border {
             border-left: 2px dotted #FFCFC9;
@@ -329,12 +325,23 @@
         .gridster {
         
         }
-            .gridster li {
+            .gridster > ul > li {
                 margin: 0;
                 background-color: #ECECEC;
                 outline: 1px dotted grey; 
                 overflow: hidden; 
             }
+            .gridster > ul > li .admin-html-holder {
+                padding: 30px 0;
+            }
+            #gridster_workbench > ul > li h1,
+            #gridster_workbench > ul > li h2,
+            #gridster_workbench > ul > li h3,
+            #gridster_workbench > ul > li h4,
+            #gridster_workbench > ul > li h5,
+            #gridster_workbench > ul > li h6 {
+                margin: 0 0 .25em;
+            }             
             .gridster li img {
                 border: 0 none;
                 left: 0;
@@ -358,7 +365,7 @@
                     outline: none!important;
                 }
 /******************************************************************************
- *  CPT Gridster post.php - METABOX right column with gridster.js widgets -> METALABELS
+ *  CPT Gridster post.php - METALABELS of gridster widgets 
 /******************************************************************************/
 	
         .gridster li .meta-label {
@@ -380,7 +387,7 @@
         }        
              
             .gridster li .meta-label label,
-            .gridster li .meta-label span {
+            .gridster li .meta-label span.ir {
                 width: 18px;
                 display: inline-block;
                 height: 18px;
@@ -388,6 +395,7 @@
                 cursor: pointer;
                 vertical-align: top;
                 opacity: .5;
+                margin-top: 2px;
             }
             .gridster li .meta-label label:hover,
             .gridster li .meta-label span:hover {
@@ -399,7 +407,23 @@
             .gridster li .meta-label span.delete-post {
                 background-position: 0 -22px;                
             }  
-
+            .gridster .meta-label select.dynamic-classes-chosen chzn-done,
+            .gridster .meta-label div.chzn-container {
+                margin-right: 5px;
+                font-size: 11px;
+            }
+                .gridster .meta-label .chzn-container-multi .chzn-choices .search-field input {
+                    font-size: 11px;
+                    height: 14px;
+                    padding: 0 5px;
+                    width: 1px!important;
+                }
+                .gridster .meta-label .chzn-container-multi .chzn-choices .search-choice {
+                    padding: 0 20px 0 5px;
+                }  
+                .gridster .meta-label .chzn-container-multi .chzn-choices .search-choice .search-choice-close {
+                    top: 1px;
+                }                              
 /******************************************************************************
  * JEDITABLE ELEMENTS
 /******************************************************************************/
@@ -409,34 +433,34 @@
     padding: 2px 20px!important;
     min-height: 1em;    
 }
-/* edit buttons */
-.gridster_edit:before,
-.gridster_edit-area:before {
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    background-position: 0 -164px;
-    content: '';
-    width: 16px;
-    height: 16px;
-    display: block;
-    visibility: hidden;
-    cursor: pointer;
-}
-.gridster li:hover .gridster_edit:before,
-.gridster li:hover .gridster_edit-area:before {
-    visibility: visible;
-}
-.gridster_edit:hover,
-.gridster_edit-area:hover {
-    background-color: rgba(255, 255, 224, .7);
-    cursor: text;
-}
+    .gridster_edit:hover,
+    .gridster_edit-area:hover {
+        background-color: rgba(255, 255, 224, .7);
+        cursor: text;
+    }
 .gridster_edit.isEdited,
 .gridster_edit-area.isEdited {
     background-color: transparent;
     display: block;
 }
+    /* edit buttons */
+    .gridster_edit:before,
+    .gridster_edit-area:before {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        background-position: 0 -164px;
+        content: '';
+        width: 16px;
+        height: 16px;
+        display: block;
+        visibility: hidden;
+        cursor: pointer;
+    }
+    .gridster li:hover .gridster_edit:before,
+    .gridster li:hover .gridster_edit-area:before {
+        visibility: visible;
+    }
     .gridster_edit form input,
     .gridster_edit-area form textarea {
         line-height: 1em;
@@ -473,7 +497,7 @@
         content: 'px';
     }    
     #gridster_options_metabox input.short-text-integer {
-        width: 40px;
+        width: 50px;
         text-align: right;
         position: relative;
         margin-top: -3px;
@@ -485,16 +509,42 @@
  * TINYMCE MODAL
 /******************************************************************************/
 
-#gridster_modal-content {
+html#gridster_modal-content {
     font-family: sans-serif;
     font-size: 12px;
     line-height: 1.4em;
     color: #333333;
-    background-color: #F5F5F5;
+    background-color: #F1F1F1;
 }
+html#gridster_modal-content,
+html#gridster_modal-content body {
+}
+    #gridster_modal-content h2 {
+        margin-bottom: .75em;
+    }
     #gridster_modal-content p {
         margin: .25em 0 .75em;
+        clear: both;
     }
+    #gridster_modal-content label {
+        display: inline-block;
+        font-size:  14px;
+        padding-left: 30px;
+        padding-right: 5%;
+        width: 65%;
+        cursor: pointer;
+        float: left;
+        margin-bottom: .5em;
+    }
+        #gridster_modal-content label input {
+            margin: 2px 0 0 -30px;
+            width: 30px;
+        }        
+        #gridster_modal-content label .alignright{
+            float: right;
+            display: inline-block;
+        }    
+    
     #gridster_modal-content a:link,
     #gridster_modal-content a:visited {
         color: #21759B;

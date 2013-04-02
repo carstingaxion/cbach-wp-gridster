@@ -9,17 +9,17 @@ jQuery(function($){
      *  
      */
     var gridster;
-    var grid_size_x = parseInt( gridster_admin.widget_base_width );
-    var grid_size_y = parseInt( gridster_admin.widget_base_height );    
-    var grid_margin_x = parseInt( gridster_admin.widget_margin_x );
-    var grid_margin_y = parseInt( gridster_admin.widget_margin_y );    
+    var grid_size_x = parseInt( gridster_admin.widget_base_width, 10 );
+    var grid_size_y = parseInt( gridster_admin.widget_base_height, 10 );    
+    var grid_margin_x = parseInt( gridster_admin.widget_margin_x, 10 );
+    var grid_margin_y = parseInt( gridster_admin.widget_margin_y, 10 );    
 /*
-    var max_size_x = parseInt( gridster_admin.max_size_x );
-    var max_size_y = parseInt( gridster_admin.max_size_y );    
+    var max_size_x = parseInt( gridster_admin.max_size_x, 10 );
+    var max_size_y = parseInt( gridster_admin.max_size_y, 10 );    
 */    
     $.fn.resizeBlock = function ( elmObj ) {
 
-        var elmObj = $(elmObj);
+//        var elmObj = $(elmObj);
         var w = elmObj.width() - grid_size_x;
         var h = elmObj.height() - grid_size_y;
 
@@ -31,7 +31,7 @@ jQuery(function($){
             grid_h++;
         }
         gridster.resize_widget(elmObj, grid_w, grid_h);
-    }
+    };
     
     
     
@@ -50,7 +50,7 @@ jQuery(function($){
         // later PHP and set value to hidden input
         $('input#gridster_layout').val( JSON.stringify(settings) );
         return;        
-    }
+    };
 
 
 
@@ -97,9 +97,11 @@ jQuery(function($){
                 $.fn.updateGridsterLayoutSettings(); 
             }, 300);
         }
-    }
+    };
 
-
+var chosen_opts = {
+    no_results_text: gridster_admin.chosenNoResultsText
+};
 
     /**
      *  Setup gridster
@@ -131,13 +133,16 @@ jQuery(function($){
         serialize_params: function($w, wgd) {
             // prepare widget HTML
             var w_html = $.trim( $('<div/>').text($($w).find('.admin-html-holder').html()).html() );
+            // get chosen CSS Classes from meta-label select
+            var css_classes = $($w).find('.dynamic-classes-chosen').val();
             return {
                 size_x: wgd.size_x,
                 size_y: wgd.size_y,                
                 col: wgd.col,
                 row: wgd.row,
                 id: $($w).attr('data-post_id'),
-                html: w_html
+                html: w_html,
+                classes: css_classes
             };
         },
         draggable: {
@@ -156,7 +161,7 @@ jQuery(function($){
             on_overlap_stop: function(collider_data) {
 //                 console.log( collider_data );
             }            
-        },        
+        }        
     }).data('gridster');
 
     
@@ -203,8 +208,12 @@ jQuery(function($){
      *  @since    1.0          
      *  
      */ 
-    $.fn.refreshWidgetHtml = function( id, load_new = false, widget_object = null ) {
+    $.fn.refreshWidgetHtml = function( id, load_new, widget_object ) {
 
+        // set defaults
+        load_new = typeof load_new !== 'undefined' ? load_new : false;
+        widget_object = typeof widget_object !== 'undefined' ? widget_object : null;        
+        
         // prepare options Array 
         var query_options = {
             
@@ -213,8 +222,7 @@ jQuery(function($){
             
             // default widget size, as image filter dimensions
             widget_width: ( widget_object ) ? widget_object.width() : grid_size_x,
-            widget_height:( widget_object ) ? widget_object.height() : grid_size_y,
-            
+            widget_height:( widget_object ) ? widget_object.height() : grid_size_y
         };
     
         // get HTML 
@@ -228,12 +236,12 @@ jQuery(function($){
                 // security checking, Nonce
                 nonce:    gridster_admin.ajaxNonce,
                 // content options
-                options: query_options, 
+                options: query_options 
             }),
             success: function( data ){
     
                 // no data
-                if ( data == '-1' || data == '' || data == '0' || data == 'undefined' ) {
+                if ( data == '-1' || data === '' || data === 0 || data == 'undefined' ) {
                 
                    // get current content from loader paragraph
                    var current_loader_p = $('#gridster_loader p').html();
@@ -269,6 +277,9 @@ jQuery(function($){
                         // add widget to workbench
                         gridster.add_widget( widget_html, 1, 1);
                         
+                        // init chosen.js on a new created <select>
+                        $.fn.initChosen( $('li.gs_w[data-post_id="'+id+'"]' ) );  
+                        
                         // update layout settings
                         $.fn.updateGridsterLayoutSettings();
                         
@@ -289,8 +300,8 @@ jQuery(function($){
                     }
                     
                     // make content editable
-                    $.fn.initJeditable();                    
-                     
+                    $.fn.initJeditable(); 
+                    
                 }
             }
         }); 
@@ -305,22 +316,25 @@ jQuery(function($){
      *  @since    1.0
      *  
      */
-    $.fn.updateQueryNotInField = function ( post_id, remove = false ) {
+    $.fn.updateQueryNotInField = function ( post_id, remove ) {
+        // set defaults
+        remove = typeof remove !== 'undefined' ? remove : false;
         // cast the string as a number
-        var id = parseInt( post_id );
+        var id = parseInt( post_id, 10 );
         // get value from hidden input
         var query_not_in = $('input#gridster_query_posts_not_in').val();
         if ( remove !== false ) {
             // convert string tp array
             var query_not_in_array = query_not_in.split(',');
             // cast the string as a number
-            query_not_in_array = query_not_in_array.map(function(v){ return parseInt(v)});
+            query_not_in_array = query_not_in_array.map(function(v){ return parseInt( v, 10 ); });
             // check if ID exists in array
             // and return array key of match
             var remove_index = query_not_in_array.indexOf(id);
             // if nothing matches, return
-            if ( remove_index < 0 )
-                return;
+            if ( remove_index < 0 ) {
+                return;            
+            }
             // remove the match from the array
             query_not_in_array.splice(remove_index,1);
             // update the hidden input with new value
@@ -334,7 +348,7 @@ jQuery(function($){
             $('input#gridster_query_posts_not_in').val( new_v );
         }
         return;        
-    }                              
+    };                              
     
     
     
@@ -356,7 +370,7 @@ jQuery(function($){
         $('<span />').attr('title', gridster_admin.textDelete ).text( gridster_admin.textDelete ).addClass('ir delete-post').appendTo( meta_label );
         
         return meta_label;
-    }                         
+    };                         
    
     
     
@@ -436,7 +450,7 @@ $(".gridster li .admin-html-holder a")
         $(this).parent().parent().hide('fast', function(){ 
 
             // cast data-attr as Integer
-            var id = parseInt( $(this).data().post_id );
+            var id = parseInt( $(this).data().post_id, 10 );
             
             // remove $post->ID from "query_not_in" input
             $.fn.updateQueryNotInField( id, true ); 
@@ -477,7 +491,7 @@ $(".gridster li .admin-html-holder a")
              
              // ommit whitespace before and after edited text
              // @see  http://stackoverflow.com/a/9087222
-             data    : function(string) {return $.trim(string)},             
+             data    : function(string) {return $.trim(string);},             
              
              // placeholder text for empty editable elements
              // set as empty, to keep frontend output clean
@@ -551,7 +565,7 @@ $(".gridster li .admin-html-holder a")
              
              // ommit whitespace before and after edited text
              // @see  http://stackoverflow.com/a/9087222
-             data    : function(string) {return $.trim(string)},
+             data    : function(string) { return $.trim(string); },
              
              // placeholder text for empty editable elements
              // set as empty, to keep frontend output clean
@@ -583,10 +597,50 @@ $(".gridster li .admin-html-holder a")
             $('button[type="submit"]').addClass('button-primary');
             $('button[type="cancel"]').addClass('button-secondary');         
         });
-     }
+                                             
+     };
      $.fn.initJeditable();
      
-     
+
+
+    /**
+     *  Init chosen.js framework for <select> elements
+     *  if there are select options defined     
+     *  
+     *  @since    1.2
+     *  
+     */
+    $.fn.initChosen = function ( widget ) {
+        // create option element for every customized option class
+        if ( gridster_admin.chosenSelectOptions != '[]' ) {        
+            // 50 is the space of mover & deleter, 80 should be the margin to the left
+            var desired_width = parseInt( ( widget.width() - 50 - 80 ), 10 );
+            // check for min-width of 100px, because chosen.js won't do this
+            var select_width = ( desired_width > 100 ) ? desired_width : 100;
+            // add CSS class select
+            var select = $('<select>').attr( 'multiple', true ).attr( 'data-placeholder', gridster_admin.chosenSelectPlaceholder ).addClass('dynamic-classes-chosen').width( select_width );        
+    
+            // create object from string
+            var chosenSelectOptions = JSON.parse( gridster_admin.chosenSelectOptions );
+            // iterate over each pair
+            $.each( chosenSelectOptions, function( key, value ) {
+                var option = $('<option>').val( key ).text( value );
+                if ( widget.hasClass( key ) ) {
+                    option.attr( 'selected', true );
+                }
+                option.appendTo( select );            
+            });
+    
+            // add select to DOM
+            //select.appendTo( meta_label );
+            select.insertBefore( widget.find('div.meta-label > span:first') );
+    
+            // apply chosen.js to new select and set options defined formerly
+            $('select.dynamic-classes-chosen').chosen( chosen_opts ).change( function() {
+                   $.fn.updateGridsterLayoutSettings();
+                });        
+        }        
+    };
      
          
     /**
@@ -599,11 +653,10 @@ $(".gridster li .admin-html-holder a")
     
         // get saved data
         var data = $('input#gridster_layout').val();
-    
         // stop here, if this is a new gridster
-        if ( data == '' || data == [] )
-            return false;
-            
+        if ( data === '' || data == [] ) {
+            return false;        
+        }
         // show loader
         $('#gridster_load-wrap').fadeIn();   
         
@@ -622,12 +675,20 @@ $(".gridster li .admin-html-holder a")
             // make new widget resizable
             widget_html.resizable( resizable_opts );
             
+            // add Class from chosen data
+            if ( typeof o.classes != 'undefined' && o.classes !== null  ) {
+                widget_html.addClass( o.classes.join(' ') );            
+            }
+            
             // add UI elements to handle widget
             //widget_html = $.fn.AddUiElemnts( widget_html );
             widget_html.append( $.fn.AddUiElemnts( ) );
     
             // add widget to workbench
             gridster.add_widget( widget_html, o.size_x, o.size_y, o.col, o.row );
+            
+            // init chosen.js on a new created <select>
+            $.fn.initChosen( $('li.gs_w[data-post_id="'+o.id+'"]' ) );             
             
         });
         // make content editable
@@ -641,7 +702,8 @@ $(".gridster li .admin-html-holder a")
         // and the layout-settings-input will contain wrongly unescaped HTML, done by the browser
         // and if this will be saved, everything is f***ed up
         $.fn.updateGridsterLayoutSettings();    
-    }
+        return false;
+    };
     
     
     
@@ -653,25 +715,13 @@ $(".gridster li .admin-html-holder a")
      *  
      */                     
     $.fn.updateMetaboxLayout = function ( ) {
-        var theme_content_width = parseInt( $('.gridster ul').data('content_width') );
-        var metabox_width = parseInt( $('#gridster_workbench_metabox').width() );
+        var theme_content_width = parseInt( $('.gridster ul').data('content_width'), 10 );
+        var metabox_width = parseInt( $('#gridster_workbench_metabox').width(), 10 );
         // width plus margin
-        var gridster_content_blocks_width = 280 + 20; //parseInt( $('#gridster_content_blocks').width() );
+        var gridster_content_blocks_width = 280 + 20; //parseInt( $('#gridster_content_blocks').width(), 10 );
         
         // workbench is smaller than themes $content_width
-        if (
-        (
-            $('#post-body').hasClass('columns-1')
-            &&
-            ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width )        
-        )
-        ||
-        ( 
-            $('#gridster_workbench_metabox').hasClass('two-columns')
-            &&
-            ( ( theme_content_width + gridster_content_blocks_width ) > metabox_width )
-        )
-        ) {
+        if ( ( $('#post-body').hasClass('columns-1') && ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width ) ) || ( $('#gridster_workbench_metabox').hasClass('two-columns') && ( ( theme_content_width + gridster_content_blocks_width ) > metabox_width ) ) ) {
             // toggle CSS classes
             $('#gridster_workbench_metabox').removeClass('two-columns').addClass('one-column');
             // wrap widget blocks in two column-wraps to adjust the way our accordion works
@@ -686,25 +736,13 @@ $(".gridster li .admin-html-holder a")
             //$('.accordion-wrap .gridster_widget-block:first h3').trigger('click');
         
         // workbench is wider than themes $content_width        
-        } else if (
-        (
-            $('#post-body').hasClass('columns-2')
-            &&
-            ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width )        
-        )
-        ||
-        ( 
-            $('#gridster_workbench_metabox').hasClass('one-column')
-            &&
-            ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width )
-        )        
-        ) {
+        } else if ( ( $('#post-body').hasClass('columns-2') && ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width ) ) || ( $('#gridster_workbench_metabox').hasClass('one-column') && ( ( theme_content_width + gridster_content_blocks_width ) < metabox_width ) ) ) {
             // toggle CSS classes
             $('#gridster_workbench_metabox').addClass('two-columns').removeClass('one-column');        
             // remove column wrapping from widget-blocks
             $('.accordion-wrap .gridster_widget-block').unwrap();
         } 
-    }
+    };
 
 
 
@@ -714,8 +752,9 @@ $(".gridster li .admin-html-holder a")
      *  @since    1.1          
      *  
      */ 
-    $.fn.getPostsByType = function( post_type, paged,  search = null ) {
-
+    $.fn.getPostsByType = function( post_type, paged,  search ) {
+        // set defaults
+        search = typeof search !== 'undefined' ? search : null;
         // prepare options Array 
         var query_options = {
             
@@ -726,7 +765,7 @@ $(".gridster li .admin-html-holder a")
             paged: paged,
             
             //
-            search: search,
+            search: search
         };
     
         // get HTML 
@@ -747,7 +786,7 @@ $(".gridster li .admin-html-holder a")
             success: function( data ){
     
                 // no data
-                if ( data == '-1' || data == '' || data == '0' || data == 'undefined' ) {
+                if ( data == '-1' || data === '' || data === 0 || data == 'undefined' ) {
                 
                     var error_msg = $('<p />').text( gridster_admin.textAjaxNothingFound );
                     error_msg = $('<div />').addClass('error').append(error_msg);
@@ -766,7 +805,7 @@ $(".gridster li .admin-html-holder a")
                      *  
                      */                             
                     $( '.gridster_widget-block li' ).draggable({
-                        revert: 'invalid',
+                        revert: 'invalid'
                     });   
                 }
                 
@@ -786,7 +825,7 @@ $(".gridster li .admin-html-holder a")
         var post_type = $(this).parentsUntil('.gridster_widget-block').parent().data('post_type');
         var paged =  $(this).data('paged');
         var search = ( $(this).data('search') ) ? $(this).data('search') : null;  
-        $.fn.getPostsByType( post_type, paged = paged, search );    
+        $.fn.getPostsByType( post_type, paged, search );    
     });
     // load search-list of posts
     //setup before functions
@@ -806,7 +845,7 @@ $(".gridster li .admin-html-holder a")
             $.fn.doneTyping( input );
         // start timer on every other key
         } else {
-            typingTimer = setTimeout( function() { $.fn.doneTyping( input ) }, doneTypingInterval);        
+            typingTimer = setTimeout( function() { $.fn.doneTyping( input ); }, doneTypingInterval);        
         }
 
     });
@@ -823,8 +862,8 @@ $(".gridster li .admin-html-holder a")
         // on the first search, we want to start on page one
         var paged =  1;
         var search = $.trim( input.val() );
-        $.fn.getPostsByType( post_type, paged = paged, search );   
-    }
+        $.fn.getPostsByType( post_type, paged, search );   
+    };
     
     
     
@@ -856,7 +895,7 @@ jQuery(document).ready(function($) {
             trig.parent().addClass('trigger_active');
     		};
     		return false;    
-    }
+    };
     // close all widget-blocks
     $('.gridster_widget-block h3, .gridster_widget-block .handlediv').not('.trigger_active').siblings('.inside').hide();
     // trigger accordion expander on click
@@ -876,11 +915,7 @@ jQuery(document).ready(function($) {
      *  
      */
     var theme_content_width = $('.gridster ul').data('content_width');
-    $('<div />')
-        .addClass('content_width-border')
-        .attr('title', gridster_admin.textMaximumContentWidth )
-        .css( 'left', theme_content_width + 'px' )
-        .appendTo( $('.gridster') );                         
+    $('<div />').addClass('content_width-border').attr('title', gridster_admin.textMaximumContentWidth ).css( 'left', theme_content_width + 'px' ).appendTo( $('.gridster') );                         
 
 
 
