@@ -83,6 +83,13 @@ There a some CSS classes you can use
 * `.gridster-wrap` is the wrapper for the whole shortcode output
 * `.gs_w` is the generic class aplied to every Gridster Widget
 
+###How to avoid the loading of `gridster_frontend.css`###
+The Plugin comes with minimal styling for the Gridster Markup, but maybe you'll add theese few lines of CSS to your own theme stylesheet to reduce server requests.
+Just set the constant `GRIDSTER_FRONTEND_CSS` to false in your themes `functions.php` file.
+`/**
+ *  Do not use gridster frontend styles
+ */
+define( 'GRIDSTER_FRONTEND_CSS', false );` 
 
 ###Do you have some question?###
 Drop me a line at gridster@carsten-bach.de
@@ -94,8 +101,10 @@ Drop me a line at gridster@carsten-bach.de
 ![Create a new Gridster by dragging your content from the Lists of your posttypes left to the workbench on the right. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-1.jpg)
 1. Create a new Gridster by dragging your content from the Lists of your posttypes left to the workbench on the right. (with WordPress 3.5.1)
 
+
 ![Move the Gridster-Widgets around via drag & drop. Underlying Widgets are re-layoutet on the fly. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-2.jpg)
 2. Move the Gridster-Widgets around via drag & drop. Underlying Widgets are re-layoutet on the fly. (with WordPress 3.5.1)
+
 
 ![Resize the Gridster-Widgets and get updated Images directly inside the workbench. The Plugin looks for the best fitting size according to your defined Thumbnail-Image-Sizes. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-3.jpg)
 3. Resize the Gridster-Widgets and get updated Images directly inside the workbench. The Plugin looks for the best fitting size according to your defined Thumbnail-Image-Sizes. (with WordPress 3.5.1)
@@ -104,14 +113,21 @@ Drop me a line at gridster@carsten-bach.de
 ![After adding a new Gridster-Widget it is pre-populated with Title and Excerpt of the fetched post. Now you are able to inline edit theese texts, without the need to modify the original post. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-4.jpg)
 4. After adding a new Gridster-Widget it is pre-populated with Title and Excerpt of the fetched post. Now you are able to inline edit theese texts, without the need to modify the original post. (with WordPress 3.5.1)
 
+
 ![You have two different types of inline-editors: input-fields and textareas. Define the editable content blocks by customizing the Gridster-Widget Templates within your Theme. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-5.jpg)
 5. You have two different types of inline-editors: input-fields and textareas. Define the editable content blocks by customizing the Gridster-Widget Templates within your Theme. (with WordPress 3.5.1)  
+
 
 ![A list of all Gridster posts, also showing the Shortcodes. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-6.jpg)
 6. A list of all Gridster posts, also showing the Shortcodes. (with WordPress 3.5.1)
 
+
 ![An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the `[gallery]`-shortcode. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-7.jpg)
 7. An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the `[gallery]`-shortcode. (with WordPress 3.5.1)
+
+
+![Style Selector with custom CSS classes, populated by the `gridster_choose_from_custom_css_classes_for_widgets` filter. And the frontend output with our custom classes appended to the WordPress post_class array. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-8.jpg)
+8. Style Selector with custom CSS classes, populated by the `gridster_choose_from_custom_css_classes_for_widgets` filter. And the frontend output with our custom classes appended to the WordPress post_class array. (with WordPress 3.5.1)
 
 
 
@@ -125,6 +141,10 @@ Drop me a line at gridster@carsten-bach.de
 * Removed some debugging stuff from stable version 
 * Enabled line-breaks in editable HTML, marked with `.gridster_edit-area`
 * Fixed saving of wrong & unescaped HTML within the layout-seetings
+* Added constant GRIDSTER_FRONTEND_CSS to disable loading of frontend stylesheet
+* JSLint'ed all javascript files
+* Added Style Select to add custom CSS classes to each Gridster Widget individually, select is populated by the new `gridster_choose_from_custom_css_classes_for_widgets` filter and is not used by default 
+
 
 ### 1.1 ###
 * Added TinyMCE Button to add shortcode
@@ -155,6 +175,8 @@ You can adjust the behavior of this plugin by using following filters:
 * Change final array of used post_types by modifying `gridster_post_types_as_widget_blocks`
 * Filter the list of visible / usable posts per post_type by hooking into `gridster_get_posts_by_type_query_args`
 * Adjust the naming convention for used templates by filtering `gridster_locate_templates_from`
+* Add custom CSS classes to each Gridster widget individually from a multiple select field enhanced by [chosen.js](http://harvesthq.github.com/chosen/), using the `gridster_choose_from_custom_css_classes_for_widgets` filter.
+  The return of your applied function should be an array() like this `array( 'alignleft' => __('Align text from left'), 'alignright' => __('Align text from right')`, where the array_keys are the CSS classes to apply and the values are the readable text for you or your editors.
 
 Have a look inside the plugin file to see, what variables you are able to use within your filter hooks.
 
