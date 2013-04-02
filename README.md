@@ -197,4 +197,5 @@ Have a look inside the plugin file to see, what variables you are able to use wi
 * [MidTone Design](http://www.midtonedesign.com/portfolio/category/portfolio/) for their [Web Injection Icons](http://www.iconfinder.com/iconsets/webinjection)
 * [Dmitry Costenco](http://www.aha-soft.com/) for his [Free Applications Icons](http://www.iconfinder.com/iconsets/freeapplication)
 * [New Moon](http://code.google.com/u/newmooon/) for their [Ultimate Gnome Icons](http://www.iconfinder.com/iconsets/UltimateGnome)
+* [Harvest](http://www.getharvest.com/) for developing [chosen.js](http://harvesthq.github.com/chosen/) a Javascript Plugin to make <select>s more user-friendly
 
