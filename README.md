@@ -13,7 +13,7 @@ Gridster is a WordPress plugin that makes building intuitive draggable layouts f
 
 **Tested up to:** 			3.5.1
 
-**Stable tag:** 				1.1
+**Stable tag:** 				1.2
 
 **License:**            GPLv2 or later
 
@@ -76,43 +76,55 @@ Have a look at the `/views/gridster-default.php` inside the plugin directory to 
 
 
 ## Frequently Asked Questions ##
-In the moment, there is no question I know about.
+### How can I customize the layout of the Gridster Widgets on the frontend?###
+There a some CSS classes you can use
+* `.gridster-not-loaded` is appended to the `<body>` element, when a shortcode is found on the current page
+* `.gridster-loaded` replaces the former mentioned `.gridster-not-loaded` body-class, when Gridster Javascript is successfully loaded
+* `.gridster-wrap` is the wrapper for the whole shortcode output
+* `.gs_w` is the generic class aplied to every Gridster Widget
 
-Maybe you've some?!
+
+###Do you have some question?###
 Drop me a line at gridster@carsten-bach.de
 
 
 
 
 ## Screenshots ##
-
-###1. Create a new Gridster by dragging your content from the Lists of your posttypes left to the workbench on the right. (with WordPress 3.5.1)###
 ![Create a new Gridster by dragging your content from the Lists of your posttypes left to the workbench on the right. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-1.jpg)
+1. Create a new Gridster by dragging your content from the Lists of your posttypes left to the workbench on the right. (with WordPress 3.5.1)
 
-###2. Move the Gridster-Widgets around via drag & drop. Underlying Widgets are re-layoutet on the fly. (with WordPress 3.5.1)###
 ![Move the Gridster-Widgets around via drag & drop. Underlying Widgets are re-layoutet on the fly. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-2.jpg)
+2. Move the Gridster-Widgets around via drag & drop. Underlying Widgets are re-layoutet on the fly. (with WordPress 3.5.1)
 
-###3. Resize the Gridster-Widgets and get updated Images directly inside the workbench. The Plugin looks for the best fitting size according to your defined Thumbnail-Image-Sizes. (with WordPress 3.5.1)###
 ![Resize the Gridster-Widgets and get updated Images directly inside the workbench. The Plugin looks for the best fitting size according to your defined Thumbnail-Image-Sizes. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-3.jpg)
+3. Resize the Gridster-Widgets and get updated Images directly inside the workbench. The Plugin looks for the best fitting size according to your defined Thumbnail-Image-Sizes. (with WordPress 3.5.1)
 
-###4. After adding a new Gridster-Widget it is pre-populated with Title and Excerpt of the fetched post. Now you are able to inline edit theese texts, without the need to modify the original post. (with WordPress 3.5.1)###
+
 ![After adding a new Gridster-Widget it is pre-populated with Title and Excerpt of the fetched post. Now you are able to inline edit theese texts, without the need to modify the original post. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-4.jpg)
+4. After adding a new Gridster-Widget it is pre-populated with Title and Excerpt of the fetched post. Now you are able to inline edit theese texts, without the need to modify the original post. (with WordPress 3.5.1)
 
-###5. You have two different types of inline-editors: input-fields and textareas. Define the editable content blocks by customizing the Gridster-Widget Templates within your Theme. (with WordPress 3.5.1)###
 ![You have two different types of inline-editors: input-fields and textareas. Define the editable content blocks by customizing the Gridster-Widget Templates within your Theme. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-5.jpg)
-  
-###6. A list of all Gridster posts, also showing the Shortcodes. (with WordPress 3.5.1)###
+5. You have two different types of inline-editors: input-fields and textareas. Define the editable content blocks by customizing the Gridster-Widget Templates within your Theme. (with WordPress 3.5.1)  
+
 ![A list of all Gridster posts, also showing the Shortcodes. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-6.jpg)
+6. A list of all Gridster posts, also showing the Shortcodes. (with WordPress 3.5.1)
 
-###7. An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the `[gallery]`-shortcode. (with WordPress 3.5.1) ###
 ![An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the `[gallery]`-shortcode. (with WordPress 3.5.1)](https://raw.github.com/carstingaxion/cbach-wp-gridster/master/screenshot-7.jpg)
-
+7. An embeded Shortcode inside the Editor is replaced by visual placeholder, to keep things easy for your editors. No need to write (short-)code. Besides it's possible to update, edit and delete the shortcode via icons, formerly known from the `[gallery]`-shortcode. (with WordPress 3.5.1)
 
 
 
 
 
 ## Changelog ##
+### 1.2 ###
+* Added two CSS classes for `<body>`, `.gridster-not-loaded` when shortode is used as a Noscript fallback and `.gridster-loaded` when JS is available and the Layout is loaded properly
+* Fix to use Return key on search-fields inside the post-lists
+* Layout improvements for showing the post_thumbnail inside the Gridster-Widget on the workbench
+* Removed some debugging stuff from stable version 
+* Enabled line-breaks in editable HTML, marked with `.gridster_edit-area`
+* Fixed saving of wrong & unescaped HTML within the layout-seetings
 
 ### 1.1 ###
 * Added TinyMCE Button to add shortcode

@@ -6,7 +6,7 @@ Author URI:       	http://carsten-bach.de
 Author:            	Carsten Bach
 Requires at least: 	3.3
 Tested up to: 			3.5.1
-Stable tag: 				1.1
+Stable tag: 				1.2
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -78,9 +78,15 @@ Have a look at the `/views/gridster-default.php` inside the plugin directory to 
 
 
 == Frequently Asked Questions ==
-In the moment, there is no question I know about.
+= How can I customize the layout of the Gridster Widgets on the frontend? =
+There a some CSS classes you can use
+* `.gridster-not-loaded` is appended to the `<body>` element, when a shortcode is found on the current page
+* `.gridster-loaded` replaces the former mentioned `.gridster-not-loaded` body-class, when Gridster Javascript is successfully loaded
+* `.gridster-wrap` is the wrapper for the whole shortcode output
+* `.gs_w` is the generic class aplied to every Gridster Widget
 
-Maybe you've some?!
+
+= Do you have some question? =
 Drop me a line at gridster@carsten-bach.de
 
 
@@ -101,6 +107,13 @@ Drop me a line at gridster@carsten-bach.de
 
 
 == Changelog ==
+= 1.2 =
+* Added two CSS classes for `<body>`, `.gridster-not-loaded` when shortode is used as a Noscript fallback and `.gridster-loaded` when JS is available and the Layout is loaded properly
+* Fix to use Return key on search-fields inside the post-lists
+* Layout improvements for showing the post_thumbnail inside the Gridster-Widget on the workbench
+* Removed some debugging stuff from stable version
+* Enabled line-breaks in editable HTML, marked with `.gridster_edit-area`
+* Fixed saving of wrong & unescaped HTML within the layout-seetings
 
 = 1.1 =
 * Added TinyMCE Button to add shortcode
