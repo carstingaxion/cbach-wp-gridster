@@ -22,8 +22,9 @@
             
       			//replace the image back to shortcode on save
       			ed.onPostProcess.add(function(ed, o) {
-        				if (o.get)
-        				    o.content = t._get_gridster_shortcode(o.content);
+        				if (o.get) {
+        				    o.content = t._get_gridster_shortcode(o.content);                
+                }
       			});
             
       			// Register commands for shortcode change modal
@@ -33,7 +34,7 @@
           					width : 300, 
           					height : 240,
           					title : ed.getLang('gridster_shortcode.popupTitle'), 
-          					inline : 1,
+          					inline : 1
         				}, {
         				    plugin_url : url
         				});
@@ -56,7 +57,7 @@
                     // append clone to parent
                     tmp.appendChild(clone);
                     // get string representation of element
-                    var stringed_el = tmp.innerHTML 
+                    var stringed_el = tmp.innerHTML; 
                     // get ID of gridster post from shortcode Attribute
                     var gridster_id = getAttr(stringed_el, 'id');
                     // get base URL
@@ -72,7 +73,7 @@
       			// Register TinyMCE button
       			ed.addButton( 'gridster_shortcode', {
                 title : ed.getLang('gridster_shortcode.buttonTitle'), 
-                cmd : 'ajax_gridster_shortcode_update_modal', 
+                cmd : 'ajax_gridster_shortcode_update_modal' 
             });
             
             // 
@@ -103,13 +104,15 @@
       			});
             // on mouse click
       			ed.onMouseDown.add(function(ed, e) {
-      				  if ( e.target.nodeName != 'IMG' )
-      				      ed.plugins.gridster_shortcode._hideButtons();
+      				  if ( e.target.nodeName != 'IMG' ) {
+      				      ed.plugins.gridster_shortcode._hideButtons();                
+                }
       			});
             // on key press
       			ed.onKeyDown.add(function(ed, e){
-        				if ( e.which == tinymce.VK.DELETE || e.which == tinymce.VK.BACKSPACE )
-        				    ed.plugins.gridster_shortcode._hideButtons();
+        				if ( e.which == tinymce.VK.DELETE || e.which == tinymce.VK.BACKSPACE ) {
+        				    ed.plugins.gridster_shortcode._hideButtons();                
+                }
       			});           
     		},
     
@@ -132,9 +135,9 @@
       			return co.replace(/(?:<p[^>]*>)*(<img[^>]+>)(?:<\/p>)*/g, function(a,im) {
         				var cls = getAttr(im, 'class');
         
-        				if ( cls.indexOf('gridsterShortcodeGUI') != -1 )
-        					return '<p>['+tinymce.trim(getAttr(im, 'title'))+']</p>';
-        
+        				if ( cls.indexOf('gridsterShortcodeGUI') != -1 ) {
+        					return '<p>['+tinymce.trim(getAttr(im, 'title'))+']</p>';                
+                }
         				return a;
       			});
     		},
@@ -143,13 +146,11 @@
     		_createButtons : function() {
       			var t = this, ed = tinymce.activeEditor, DOM = tinymce.DOM, editButton, dellButton, isRetina;
       
-      			if ( DOM.get('gridster_sr_btns') )
-      			    return;
+      			if ( DOM.get('gridster_sr_btns') ) {
+      			    return;            
+            }
       
-      			isRetina = 
-                ( window.devicePixelRatio && window.devicePixelRatio > 1 ) // WebKit, Opera
-                || 
-      				  ( window.matchMedia && window.matchMedia('(min-resolution:130dpi)').matches ); // Firefox, IE10, Opera
+      			isRetina = ( window.devicePixelRatio && window.devicePixelRatio > 1 ) || ( window.matchMedia && window.matchMedia('(min-resolution:130dpi)').matches ); 
       
       			DOM.add(document.body, 'div', {
         				id : 'gridster_sr_btns',
