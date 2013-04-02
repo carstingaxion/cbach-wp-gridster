@@ -45,7 +45,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @used  when enqueuing scripts & styles
          *   @type  string
          */      	
-        protected $version = '1.1';
+        protected $version = '1.2';
         
         
         /**
@@ -82,11 +82,40 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          */      	
         protected $nonce = 'gridster_nonce'; 
         
-                
+        
+        /**
+         *  Post_type name
+         *  
+         *  @type   string
+         */                                             
         private $cpt_gridster = 'gridster';
+        
+        
+        /**
+         *  Shortcode name
+         *  
+         *  @type   string
+         */                                     
         private $gridster_shortcode = 'gridster';
         
+        
+        /**
+         *  Slug of the options page
+         *  
+         *  @used for whitelisting options, generating menu slug and tabs
+         *  
+         *  @type   string
+         */                                                       
         private $default_settings_slug = 'gridster_default_options';
+        
+        
+        /**
+         *  Settings Identifier
+         *  
+         *  @used as array_key of serialized options
+         *  
+         *  @type   string
+         */                                                       
         private $default_settings_name = 'gridster_default_options'; 
 
 
@@ -100,7 +129,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         
 
         /**
-         *   Our Tabs on the settings page
+         *   Settings of current gridster post
          *
          *   @see   load_post_settings()
          *   @type  array
@@ -176,8 +205,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       	 *   
       	 */                  
       	public function deactivate() {
-            
-
       	} 
         
         
@@ -196,6 +223,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             if ( __FILE__ != WP_UNINSTALL_PLUGIN )
                 return;
             
+            // get all gridster posts
             $all_gridsters = get_posts( array( 
                 'posts_per_page'=> -1,
                 'post_type' => $this->cpt_gridster,
@@ -301,8 +329,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 // AJAX callback for TinyMCE modal, initiated by Button
                 add_action('wp_ajax_ajax_get_posts_by_type_widget_block', array( &$this, 'ajax_get_posts_by_type_widget_block' ) );
 
-
-                add_action('wp_ajax_ajax_get_textile_markup_for_jeditable', array( &$this, 'ajax_get_textile_markup_for_jeditable' ) );
+                // AJAX callback for textile rendering of Jeditable "textile" field 
+#                add_action('wp_ajax_ajax_get_textile_markup_for_jeditable', array( &$this, 'ajax_get_textile_markup_for_jeditable' ) );
             } else {
                 
                 // Render gridster Shortcode
@@ -316,7 +344,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 
                 // add body_class
                 add_filter( 'body_class', array( &$this, 'body_class' ), 100, 1);
-            
             }
             
             // apply image size filter to all AJAX requests        
@@ -331,6 +358,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @since    1.0                  
          *  
+         *  @todo     add minified string to base stylesheet
+         *              
          */                          
         public function admin_css () {
 
@@ -341,7 +370,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             wp_enqueue_style( $this->prefix.'admin_css' );
             $deps[] = $this->prefix.'admin_css';
             
-            // get gridster styles for our workbench
+            // get styles for our workbench
             if ( $this->current_screen->base == 'post' && $this->current_screen->post_type == $this->cpt_gridster ) {
                 wp_register_style( 'jquery-ui-base-css', plugins_url( '/css/jquery-ui/jquery-ui-base.'.$this->minified_css_files.'css', __FILE__ ), $deps, '1.0' );         
                 wp_enqueue_style( 'jquery-ui-base-css' );
@@ -357,6 +386,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         /**
          *  Adds JavaScript to the WP BE
          *  
+         *  @since    1.0 
+         *  
+         *  @todo     add minified string to base script    
+         *             
          */                          
         public function admin_js () {
             
@@ -409,7 +442,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 wp_enqueue_script( 'jquery_jeditable_autogrow_extension_js' );
                 $deps[] = 'jquery_jeditable_autogrow_extension_js';    
                               
-                // autogrow Plugin used for <textarea>a from jeditable 
+                // autogrow Plugin used for <textarea> of type "autogrow" from jeditable 
                 wp_register_script( 'jquery_autogrow_js', plugins_url( '/js/jeditable/jquery.autogrow.js', __FILE__ ), $deps, '1.2.2' );
                 wp_enqueue_script( 'jquery_autogrow_js' );
                 $deps[] = 'jquery_autogrow_js';   
@@ -427,6 +460,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         /**
          *  Adds JavaScript to the frontend
          *  
+         *  @since    1.0 
+         *  
+         *  @todo     add minified string to base script 
+         *                        
          */                          
         public function print_js () {
             
@@ -472,6 +509,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @since    1.0
          *  
+         *  @todo     add minified string to base script 
+         *             
          */
         public function print_css () {
         
@@ -498,6 +537,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
 
         /**
          *  Register Custom-Post-Type "gridster"
+         *  
+         *  @since    1.0   
+         *                  
          */       
         public function gridster_register_as_posttype() {
 
@@ -677,6 +719,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
     		 *	Show Shortcode inside the "publish"-meta_box
     		 *
     		 *  @since    1.0
+    		 *           
     		 */
     		function add_shortcode_to_publish_metabox() {
     		    global $post;
@@ -685,15 +728,17 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 return;
                 
     		    echo '<div class="misc-pub-section ' . $this->prefix . 'shortcode-copy-section" >'. __('Shortcode').': ';
-            echo '<input type="text" class="'.$this->prefix.'shortcode-in-list-table" value="['.$this->gridster_shortcode.' id=&quot;'.$post->ID.'&quot; title=&quot;'.get_the_title($post->ID).'&quot;]" readonly="readonly" onfocus="this.select();">';    		    
+                echo '<input type="text" class="'.$this->prefix.'shortcode-in-list-table" value="['.$this->gridster_shortcode.' id=&quot;'.$post->ID.'&quot; title=&quot;'.get_the_title($post->ID).'&quot;]" readonly="readonly" onfocus="this.select();">';    		    
     		    echo '</div>';
     		}
 
     
     
         /**
-         *  Init all metaboxes
+         *  Init all metaboxes used for gridster post_type
          *  
+         *  @since    1.0 
+         *             
          */                          
         public function add_meta_boxes () {
             
@@ -726,7 +771,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  Add CSS class to metabox
          *  
          *  by default, set this to a 2-columns layout,
-         *  whta will be changed by JS on resizing the workbench
+         *  what will be changed by JS on resizing of screen or workbench area
          *  
          *  @since    1.0
          *  
@@ -862,6 +907,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 $name = esc_attr( $this->prefix . 'dimensions['.$name.']' );
                 // escape field value
                 $value = esc_attr( $value );
+                
                 echo '<p><label for="'.$id.'" class="short-text-integer">'.$label;
                 echo '<input type="number" id="'.$id.'" name="'.$name.'" value="'.$value.'" class="short-text short-text-integer alignright" /></label></p>';              
             }  
@@ -897,6 +943,14 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
  *  
  ***************************************************************************************************************************************************************************************************/
 
+        
+        
+        /**
+         *  Define default settings
+         *  
+         *  @since    1.0 
+         *             
+         */                          
         protected function get_default_settings () {
             return array(
               'version' => $this->version,
@@ -989,7 +1043,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         /**
          *   Loads post_meta of current gridster 
          *   
-         *   @since    1.0      
+         *   @since    1.0  
+         *                
          */
         public function load_post_settings( $post_id ) {
         
@@ -1176,8 +1231,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                     'label_for' => $this->default_settings_name.'-widget_base_height',
                 )            
             );            
-            
-                
       	}
         
         
@@ -1501,6 +1554,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @return   string    HTML of the modal window, showing a list of all available gridster-posts
          *  
+         *  @todo     remove file caching, used for debugging  
+         *             
          */                                                                                 
         public function ajax_gridster_shortcode_update_modal ( ) {
 
@@ -1524,10 +1579,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             echo '<head>';
             
             // append CSS 
+            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . includes_url( '/js/tinymce/themes/advanced/skins/wp_theme/dialog.css?cache=' . $date->getTimestamp(), __FILE__ ) . '">';            
+#            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.css', __FILE__ ) . '">';
             // for debug only
             $date = new DateTime();
-#            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.css', __FILE__ ) . '">';
-            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . includes_url( '/js/tinymce/themes/advanced/skins/wp_theme/dialog.css?cache=' . $date->getTimestamp(), __FILE__ ) . '">';            
             echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.css?cache=' . $date->getTimestamp(), __FILE__ ) . '">';            
             echo '<script language="javascript" type="text/javascript" src="' . plugins_url( '/tinymce/tinymce_gridster_shortcode_modal.js?cache=' . $date->getTimestamp(), __FILE__ ) . '" /></script>';            
 
@@ -1676,6 +1731,15 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         
         
         
+        /**
+         *  Render content of Jeditable field "textile"
+         *  from textile markup to HTML and vice versa
+         *  
+         *  @since    1.2
+         *  
+         *  @todo     finish this stuff
+         *  
+         */                                                                       
         public function ajax_get_textile_markup_for_jeditable () {
             if ( !empty( $_POST['value'] ) ) {
                 $v = $_POST['value'];
@@ -1684,11 +1748,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             } else {
                 die();            
             }
-
             
             include_once '/libs/Textile.php';
             $t = new Textile();
-            /* What is echoed back will be shown in webpage after editing.*/
             echo $t->TextileThis( stripslashes( $v ) );        
         } 
         
@@ -1802,6 +1864,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @return   array   all loaded TinyMCE plugins
          *  
+         *  @todo     remove file caching, used for debugging                  
+         *  
          */                                                                                 
         public function mce_external_plugins ( $plugin_array ) {
 #            $plugin_array['gridster_shortcode'] = plugins_url( '/tinymce/tinymce_gridster_shortcode_plugin.js', __FILE__ );      
@@ -1823,6 +1887,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @return   array   updated tinymce options with new editor styles appended
          *  
+         *  @todo     remove file caching, used for debugging  
+         *             
          */                                                                              
         public function tiny_mce_before_init ( $editor_styles ) {
 #            $editor_styles['content_css'] .= ',' . plugins_url( '/css/gridster_shortcode_editor-style.'.$this->minified_css_files.'css' , __FILE__ );
@@ -1841,11 +1907,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @param    array   tinymce buttons
          *  
-         *  @return   array   updated tinymce buttons including "Insert Gridster" Button
+         *  @return   array   updated tinymce buttons including a seperator and the"Insert Gridster" Button
          *  
          */                                        
         public function mce_buttons ( $buttons ) {
-          	// inserts a separator between existing buttons and our new one
           	array_push( $buttons, '|', 'gridster_shortcode' );
           	return $buttons;
         }
@@ -1859,6 +1924,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  @since    1.1                  
          *
          *  @see      http://dnaber.de/blog/2012/wordpress-tinymce-plugin-mit-dialogbox/
+         *           
          *  @param    array     external languages files per Plugin
          *           
          *  @return   array     updated external languages files per Plugin
@@ -1899,7 +1965,19 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
 
 
 
-         public function shortcode_render_gridster ( $atts ) {
+        /**
+         *  Output of [gridster ...] Shortcode
+         *  renders wrapper and an un-ordered list of all widgets
+         *  setting the data-attributes, used by Javascript
+         *  
+         *  @since    1.0
+         *  
+         *  @param    array   Shortcode attributes
+         *  
+         *  @return   string  echoed HTML
+         *  
+         */                                                                                                                    
+        public function shortcode_render_gridster ( $atts ) {
             
             // extract working variables and fallback to defaults
             extract( shortcode_atts( array(
@@ -1939,6 +2017,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         
             return $output; 
         }
+
 
 
 /***************************************************************************************************************************************************************************************************
@@ -2003,6 +2082,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  @param    int     $post->ID
          *  
          *  @return   bool    wether the $post is visible to the user or not
+         *  
+         *  @todo     Check for other post_statuses also : private, protected, sheduled, etc.                  
          *  
          */
         private function is_visible ( $post_id ) {
