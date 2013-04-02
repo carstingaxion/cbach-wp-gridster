@@ -335,6 +335,15 @@
                 outline: 1px dotted grey; 
                 overflow: hidden; 
             }
+            .gridster li img {
+                border: 0 none;
+                left: 0;
+                opacity: 0.25;
+                position: absolute;
+                top: 0;
+                height: 100%;
+                width: auto;            
+            }            
             .gridster li.ui-resizable-resizing {
                 z-index: 9999999 !important;
             }
@@ -397,19 +406,26 @@
 .gridster_edit,
 .gridster_edit-area {
     position: relative;
-    padding: 2px 20px;
+    padding: 2px 20px!important;
     min-height: 1em;    
 }
+/* edit buttons */
 .gridster_edit:before,
 .gridster_edit-area:before {
     position: absolute;
     top: 2px;
     left: 2px;
+    background-position: 0 -164px;
     content: '';
     width: 16px;
     height: 16px;
     display: block;
-    background-position: 0 -164px;
+    visibility: hidden;
+    cursor: pointer;
+}
+.gridster li:hover .gridster_edit:before,
+.gridster li:hover .gridster_edit-area:before {
+    visibility: visible;
 }
 .gridster_edit:hover,
 .gridster_edit-area:hover {
@@ -419,6 +435,7 @@
 .gridster_edit.isEdited,
 .gridster_edit-area.isEdited {
     background-color: transparent;
+    display: block;
 }
     .gridster_edit form input,
     .gridster_edit-area form textarea {

@@ -491,6 +491,50 @@ $(".gridster li .admin-html-holder a")
                 $.fn.updateGridsterLayoutSettings();      
              }             
          });
+/*
+         $('.gridster_edit-area.textile').editable( gridster_admin.ajaxUrl + '?action=ajax_get_textile_markup_for_jeditable&nonce=' + gridster_admin.ajaxNonce , {
+             type      : 'autogrow',             
+             cancel    : gridster_admin.JeditableCancel,
+             submit    : gridster_admin.JeditableOk,
+             
+             indicator : '<img src=\"/wp-admin/images/wpspin_light.gif\">',
+             loadurl   : gridster_admin.ajaxUrl + '?action=ajax_get_textile_markup_for_jeditable&nonce=' + gridster_admin.ajaxNonce, 
+             loaddata  : function(value, settings) {
+                 return { value: value };
+             },
+             // Default action of when user clicks outside of editable area is to cancel edits. 
+             // You can control this by setting onblur option. 
+             // Possible values are: "cancel", "submit" and "ignore"
+             onblur: 'submit',
+             //onblur: 'ignore', // for debugging only
+             
+             // ommit whitespace before and after edited text
+             // @see  http://stackoverflow.com/a/9087222
+             data    : function(string) {return $.trim(string)},
+             
+             // placeholder text for empty editable elements
+             // set as empty, to keep frontend output clean
+             // @see http://datatables.net/forums/discussion/5865/jeditable-and-default-click-to-edit/p1
+             placeholder : '',
+             
+             //
+             autogrow : {
+                 lineHeight : 16,
+                 minHeight  : 32
+             }, 
+                         
+             
+             // function triggered after submit succeeded
+             callback: function(value, settings) {
+                // fix for line-breaks with textile
+                // http://birdchan.com/home/2012/02/24/jeditable-textile-textarea-renderer-issue/
+                var retval = value.replace(/\n/gi, "<br>\n"); 
+                $(this).html(retval);
+                // update layout settings
+                $.fn.updateGridsterLayoutSettings();      
+             }               
+         }); 
+*/         
    
          $('.gridster_edit-area').editable( function( value, settings ) { 
              return(value);
@@ -522,13 +566,13 @@ $(".gridster li .admin-html-holder a")
              
              // function triggered after submit succeeded
              callback: function(value, settings) {
-    
                 // update layout settings
                 $.fn.updateGridsterLayoutSettings();      
              }               
          });    
-        
-        
+                        
+         
+                 
         /**
          *  Add WordPress UI default styles to Jeditable form buttons
          *  
@@ -589,7 +633,14 @@ $(".gridster li .admin-html-holder a")
         // make content editable
         $.fn.initJeditable();
         // hide loader
-        $('#gridster_load-wrap').fadeOut();   
+        $('#gridster_load-wrap').fadeOut();
+        // update layout settings
+        // do ths because:
+        // if you save your gridster post and didn't modify the gridster itself, 
+        // this function is never triggered
+        // and the layout-settings-input will contain wrongly unescaped HTML, done by the browser
+        // and if this will be saved, everything is f***ed up
+        $.fn.updateGridsterLayoutSettings();    
     }
     
     
@@ -745,9 +796,19 @@ $(".gridster li .admin-html-holder a")
     var doneTypingInterval = 2000;  
     
     //on keyup, start the countdown
-    $(document).on( 'keyup', '.gridster_search-posts-by-type', function(){
+    $(document).on( 'keyup', '.gridster_search-posts-by-type', function( e ){
         var input = $(this);    
-        typingTimer = setTimeout( function() { $.fn.doneTyping( input ) }, doneTypingInterval);
+        // disable "Enter" on search forms, to prevent WordPress from starting the save hook
+        if ( e.which == 13 ) {
+            // prevent post-form submission
+            e.preventDefault();        
+            // start search right now
+            $.fn.doneTyping( input );
+        // start timer on every other key
+        } else {
+            typingTimer = setTimeout( function() { $.fn.doneTyping( input ) }, doneTypingInterval);        
+        }
+
     });
     
     //on keydown, clear the countdown 
@@ -763,8 +824,8 @@ $(".gridster li .admin-html-holder a")
         var paged =  1;
         var search = $.trim( input.val() );
         $.fn.getPostsByType( post_type, paged = paged, search );   
-    }                
-     
+    }
+    
     
     
 });  // end // jQuery(function($){  
@@ -861,7 +922,7 @@ jQuery(document).ready(function($) {
     });  
 
 
-
+/*
     // toggle Class on Jeditable elements when edited
     $('.gridster_edit, .gridster_edit-area').click( function() {
         if ( $(this).hasClass( 'isEdited' ) ) {
@@ -870,7 +931,7 @@ jQuery(document).ready(function($) {
             $(this).addClass( 'isEdited' );        
         }
     }); 
-/*
+
     // toggle Class on Jeditable elements when edited
     $('.gridster_edit input, .gridster_edit-area input').click( function() {
         if ( $(this).parent().parent().hasClass( 'isEdited' ) ) {
