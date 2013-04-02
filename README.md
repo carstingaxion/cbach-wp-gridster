@@ -3,7 +3,7 @@
 ## Description ##
 Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 
-**Tags:** 							GUI, gridster, layout management, drag & drop, grid, multi-column, columns, user-friendly, shortcode
+**Tags:** 							grid layout, GUI, gridster, layout management, drag & drop, grid, multi-column, columns, magazine, user-friendly, shortcode
 
 **Author URI:**       	http://carsten-bach.de
 

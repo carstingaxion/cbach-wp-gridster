@@ -1,7 +1,7 @@
 === Gridster ===
 Contributors: 			carstenbach
 Donate link: 				https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=66FUUVCK9PFQJ
-Tags: 							GUI, gridster, layout management, drag & drop, grid, multi-column, columns, user-friendly, shortcode
+Tags: 							grid layout, GUI, gridster, layout management, drag & drop, grid, multi-column, columns, magazine, user-friendly, shortcode
 Author URI:       	http://carsten-bach.de
 Author:            	Carsten Bach
 Requires at least: 	3.3
@@ -88,10 +88,11 @@ There a some CSS classes you can use
 = How to avoid the loading of `gridster_frontend.css` =
 The Plugin comes with minimal styling for the Gridster Markup, but maybe you'll add theese few lines of CSS to your own theme stylesheet to reduce server requests.
 Just set the constant `GRIDSTER_FRONTEND_CSS` to false in your themes `functions.php` file.
-`/**
- *  Do not use gridster frontend styles
- */
-define( 'GRIDSTER_FRONTEND_CSS', false );` 
+
+    /**
+     *  Do not use gridster frontend styles
+     */
+    define( 'GRIDSTER_FRONTEND_CSS', false ); 
 
 = Do you have some question? =
 Drop me a line at gridster@carsten-bach.de
