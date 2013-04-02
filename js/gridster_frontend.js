@@ -1,5 +1,16 @@
 jQuery(function($){ 
 
+}); 
+
+
+
+jQuery(document).ready(function($) {
+
+/*********************************************************************************************************************************************
+ *  CPT Gridster post.php 
+ ********************************************************************************************************************************************/
+
+
 
 
     /**
@@ -57,7 +68,7 @@ jQuery(function($){
      *  
      */
     $.fn.LoadWidgetsOnStart = function () {
-    
+/*    
         // get saved data
         var data = gridster_frontend.layout;
     
@@ -79,9 +90,12 @@ jQuery(function($){
             gridster.add_widget( widget_html, o.size_x, o.size_y, o.col, o.row );
             
         });
-
+*/
+        // remove default gridster body_class and 
+        // replace it with the loaded class
+        $('body').removeClass('gridster-not-loaded').addClass('gridster-loaded');
     }
-   // $.fn.LoadWidgetsOnStart();
+    $.fn.LoadWidgetsOnStart();
     
 
 
@@ -92,17 +106,6 @@ jQuery(function($){
      *  
      */
     gridster.disable();                             
-
-
-}); 
-
-
-
-jQuery(document).ready(function($) {
-
-/*********************************************************************************************************************************************
- *  CPT Gridster post.php 
- ********************************************************************************************************************************************/
 
 
                             
