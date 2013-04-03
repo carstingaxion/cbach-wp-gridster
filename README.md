@@ -13,7 +13,7 @@ Gridster is a WordPress plugin that makes building intuitive draggable layouts f
 
 **Tested up to:** 			3.5.1
 
-**Stable tag:** 				1.2
+**Stable tag:** 				1.2.1
 
 **License:**            GPLv2 or later
 
@@ -134,6 +134,10 @@ Drop me a line at gridster@carsten-bach.de
 
 
 ## Changelog ##
+
+### 1.2.1 ###
+* Removed some debugging code to avoid Fatal Error on activation in PHP < 5.3
+
 ### 1.2 ###
 * Added two CSS classes for `<body>`, `.gridster-not-loaded` when shortode is used as a Noscript fallback and `.gridster-loaded` when JS is available and the Layout is loaded properly
 * Fix to use Return key on search-fields inside the post-lists

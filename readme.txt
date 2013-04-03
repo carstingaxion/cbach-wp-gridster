@@ -6,7 +6,7 @@ Author URI:       	http://carsten-bach.de
 Author:            	Carsten Bach
 Requires at least: 	3.3
 Tested up to: 			3.5.1
-Stable tag: 				1.2
+Stable tag: 				1.2.1
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -80,6 +80,7 @@ Have a look at the `/views/gridster-default.php` inside the plugin directory to 
 == Frequently Asked Questions ==
 = How can I customize the layout of the Gridster Widgets on the frontend? =
 There a some CSS classes you can use
+
 * `.gridster-not-loaded` is appended to the `<body>` element, when a shortcode is found on the current page
 * `.gridster-loaded` replaces the former mentioned `.gridster-not-loaded` body-class, when Gridster Javascript is successfully loaded
 * `.gridster-wrap` is the wrapper for the whole shortcode output
@@ -115,6 +116,9 @@ Drop me a line at gridster@carsten-bach.de
 
 
 == Changelog ==
+= 1.2.1 =
+* Removed some debugging code to avoid Fatal Error on activation in PHP < 5.3
+
 = 1.2 =
 * Added two CSS classes for `<body>`, `.gridster-not-loaded` when shortode is used as a Noscript fallback and `.gridster-loaded` when JS is available and the Layout is loaded properly
 * Fix to use Return key on search-fields inside the post-lists
