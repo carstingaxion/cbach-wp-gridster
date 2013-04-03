@@ -325,11 +325,12 @@ body.settings_page_gridster_default_options #icon-options-general {
         .gridster {
         
         }
-            .gridster > ul > li {
+            .gridster > ul > li.gs_w {
                 margin: 0;
                 background-color: #ECECEC;
                 outline: 1px dotted grey; 
                 overflow: hidden; 
+                z-index: 1;
             }
             .gridster > ul > li .admin-html-holder {
                 padding: 30px 0;
@@ -407,16 +408,18 @@ body.settings_page_gridster_default_options #icon-options-general {
             .gridster li .meta-label span.delete-post {
                 background-position: 0 -22px;                
             }  
-            .gridster .meta-label select.dynamic-classes-chosen chzn-done,
+            .gridster .meta-label select.dynamic-classes-chosen.chzn-done,
             .gridster .meta-label div.chzn-container {
                 margin-right: 5px;
                 font-size: 11px;
+                width: auto !important;
+                max-width: 85%;
             }
                 .gridster .meta-label .chzn-container-multi .chzn-choices .search-field input {
                     font-size: 11px;
                     height: 14px;
                     padding: 0 5px;
-                    width: 1px!important;
+                    xwidth: 1px!important;
                 }
                 .gridster .meta-label .chzn-container-multi .chzn-choices .search-choice {
                     padding: 0 20px 0 5px;
