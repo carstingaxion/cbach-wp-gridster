@@ -4,7 +4,7 @@ Plugin Name: 			Gridster
 Plugin URI:       https://github.com/carstingaxion/cbach-wp-gridster
 Description:      Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 Author:      			Carsten Bach
-Version: 					1.2
+Version: 					1.3
 Author URI:    		http://carsten-bach.de
 */
 
@@ -12,7 +12,8 @@ Author URI:    		http://carsten-bach.de
 if( ! class_exists( 'cbach_wpGridster' ) ) {
     class cbach_wpGridster {
        
-       
+        CONST PHPNEED = '5.0.4';
+        CONST WPNEED = '3.1';
         
       	/**
       	 *   For easier overriding we declared some keys here as well as our
@@ -45,7 +46,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @used  when enqueuing scripts & styles
          *   @type  string
          */      	
-        protected $version = '1.2';
+        protected $version = '1.3';
         
         
         /**
@@ -153,12 +154,23 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       	protected $thumbnail_filter_dimensions = array(); 
         
         
+        /**
+         *  Capability which allows users to overwrite the default layout settings for each gridster
+         *  
+         *  @type   string
+         */
+        protected $overwrite_caps = 'edit_theme_options';
         
+                                              
         /**
          *  Construct the CLASS
          *  
+         *  @todo remove script debug                  
+         *  
          */  
       	public function __construct() {
+
+define( 'SCRIPT_DEBUG', true );
 
             // Used by some fn, i.e. add_settings_link() later.
             $this->base_name = plugin_basename( __FILE__ ); 
@@ -166,6 +178,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // wether to use concetenated scripts & styles or the developer versions
             $this->minified_js_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
             $this->minified_css_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
+                        
+            // get the capability, which allows user to overwrite the default options per each gridster
+	          $this->overwrite_caps = apply_filters( 'gridster_overwrite_post_options_with_cap', $this->overwrite_caps );
         
             //Hook up to the init action
         		add_action( 'init', array( &$this, 'init' ) );
@@ -377,15 +392,13 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @since    1.0                  
          *  
-         *  @todo     add minified string to base stylesheet
-         *              
          */                          
         public function admin_css () {
 
             $deps = array();
             
             // get plugin base styles, for metaboxes, admin options and so on
-            wp_register_style( $this->prefix.'admin_css', plugins_url( '/css/gridster_admin.css', __FILE__ ), $deps, $this->version );
+            wp_register_style( $this->prefix.'admin_css', plugins_url( '/css/gridster_admin.'.$this->minified_css_files.'css', __FILE__ ), $deps, $this->version );
             wp_enqueue_style( $this->prefix.'admin_css' );
             $deps[] = $this->prefix.'admin_css';
             
@@ -414,8 +427,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @since    1.0 
          *  
-         *  @todo     add minified string to base script and both autogrow-scripts    
-         *             
          */                          
         public function admin_js () {
             
@@ -434,7 +445,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
               'JeditableCancel' => esc_attr__( 'Cancel', 'cbach-wp-gridster' ),              
               'JeditableOk' => esc_attr__( 'OK', 'cbach-wp-gridster' ),
               
-#              'chosenSelectOptions' => '',
               'chosenSelectOptions' => json_encode( $this->default_settings['chosen_select_options'] ),
               'chosenSelectPlaceholder' => esc_attr__( 'Choose styles', 'cbach-wp-gridster' ),
               'chosenNoResultsText' => esc_attr__( 'No results matched', 'cbach-wp-gridster' ),
@@ -480,13 +490,11 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
 
                 // chosen.js 
                 wp_register_script( 'chosen_js', plugins_url( '/js/chosen/chosen.jquery.'.$this->minified_js_files.'js', __FILE__ ), $deps, '0.9.12' );                
-#                wp_register_script( 'chosen_js', plugins_url( '/js/chosen/chosen.jquery.modified.js', __FILE__ ), $deps, '0.9.12' );
                 wp_enqueue_script( 'chosen_js' );
                 $deps[] = 'chosen_js';   
                 
                 // plugin base script
-                wp_register_script( $this->prefix.'admin_js', plugins_url( '/js/gridster_admin.js', __FILE__ ), $deps, $this->version );
-#                wp_register_script( $this->prefix.'admin_js', plugins_url( '/js/gridster_admin____.js', __FILE__ ), $deps, $this->version );
+                wp_register_script( $this->prefix.'admin_js', plugins_url( '/js/gridster_admin.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->version );
                 wp_enqueue_script( $this->prefix.'admin_js' );
                 wp_localize_script( $this->prefix.'admin_js', $this->prefix.'admin', $localize );        
             }
@@ -500,8 +508,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @since    1.0 
          *  
-         *  @todo     add minified string to base script 
-         *                        
          */                          
         public function print_js () {
             
@@ -534,7 +540,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             $deps[] = $this->prefix.'lib_js';                
 
             // plugin base script
-            wp_register_script( $this->prefix.'frontend_js', plugins_url( '/js/gridster_frontend.js', __FILE__ ), $deps, $this->version );
+            wp_register_script( $this->prefix.'frontend_js', plugins_url( '/js/gridster_frontend.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->version );
             wp_enqueue_script( $this->prefix.'frontend_js' );            
             wp_localize_script( $this->prefix.'frontend_js', $this->prefix.'frontend', $localize );        
 
@@ -547,8 +553,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @since    1.0
          *  
-         *  @todo     add minified string to base script 
-         *             
          */
         public function print_css () {
         
@@ -560,7 +564,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // default dependencies for loading our style files
             $deps = array();
             
-            wp_register_style( $this->prefix.'frontend_css', plugins_url( '/css/gridster_frontend.css', __FILE__ ), $deps, $this->version );
+            wp_register_style( $this->prefix.'frontend_css', plugins_url( '/css/gridster_frontend.'.$this->minified_css_files.'css', __FILE__ ), $deps, $this->version );
             wp_enqueue_style( $this->prefix.'frontend_css' );
         }                 
         
@@ -791,15 +795,20 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 'high'
             );
             
-            // add "Options" meta box to gridster post_types
-	          add_meta_box( 
-                'gridster_options_metabox', 
-                __( 'Gridster - Layout options', 'cbach-wp-gridster' ), 
-                array( &$this, 'gridster_options_meta_box' ), 
-                $this->cpt_gridster, 
-                'side', 
-                'default'
-            );
+            // add "Layout Options" meta box to gridster post_types
+            // if current user has capabilities to overwrite default settings
+            if ( current_user_can( $this->overwrite_caps ) ) {
+                add_meta_box( 
+                    'gridster_options_metabox', 
+                    __( 'Gridster - Layout options', 'cbach-wp-gridster' ), 
+                    array( &$this, 'gridster_options_meta_box' ), 
+                    $this->cpt_gridster, 
+                    'side', 
+                    'default'
+                );            
+            }
+
+            
             // add CSS classes filter for workbench-metabox            
             add_filter( 'postbox_classes_gridster_gridster_workbench_metabox', array( &$this, 'postbox_classes_post_gridster_workbench_metabox' ) );
         }
@@ -1423,7 +1432,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // save our data
             update_post_meta( $post_id, '_gridster_query_posts_not_in', $query_posts_not_in);
             update_post_meta( $post_id, '_gridster_layout', $gridster_layout);
-            if ( !empty( $dimensions ) )
+            
+            // check for existence of data AND user capabilites
+            if ( !empty( $dimensions ) && current_user_can( $this->overwrite_caps ) )
                 update_post_meta( $post_id, '_gridster_dimensions', $dimensions );             
             
         }                                                                                   
@@ -1591,8 +1602,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @return   string    HTML of the modal window, showing a list of all available gridster-posts
          *  
-         *  @todo     remove file caching, used for debugging  
-         *             
          */                                                                                 
         public function ajax_gridster_shortcode_update_modal ( ) {
 
@@ -1617,12 +1626,12 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             
             // append CSS 
             echo '<link rel="stylesheet" media="screen" type="text/css" href="' . includes_url( '/js/tinymce/themes/advanced/skins/wp_theme/dialog.css', __FILE__ ) . '">';            
-#            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.css', __FILE__ ) . '">';
+            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.'.$this->minified_css_files.'css', __FILE__ ) . '">';
 #            echo '<script language="javascript" type="text/javascript" src="' . plugins_url( '/tinymce/tinymce_gridster_shortcode_modal.js', __FILE__ ) . '" /></script>';
             // for debug only
-            $date = new DateTime();
-            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.css?cache=' . $date->getTimestamp(), __FILE__ ) . '">';            
-            echo '<script language="javascript" type="text/javascript" src="' . plugins_url( '/tinymce/tinymce_gridster_shortcode_modal.js?cache=' . $date->getTimestamp(), __FILE__ ) . '" /></script>';            
+#            $date = new DateTime();
+#            echo '<link rel="stylesheet" media="screen" type="text/css" href="' . plugins_url( '/css/gridster_admin.css?cache=' . $date->getTimestamp(), __FILE__ ) . '">';            
+#            echo '<script language="javascript" type="text/javascript" src="' . plugins_url( '/tinymce/tinymce_gridster_shortcode_modal.js?cache=' . $date->getTimestamp(), __FILE__ ) . '" /></script>';            
 
             echo '</head><body>';
 
@@ -1902,14 +1911,12 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @return   array   all loaded TinyMCE plugins
          *  
-         *  @todo     remove file caching, used for debugging                  
-         *  
          */                                                                                 
         public function mce_external_plugins ( $plugin_array ) {
-#            $plugin_array['gridster_shortcode'] = plugins_url( '/tinymce/tinymce_gridster_shortcode_plugin.js', __FILE__ );      
+            $plugin_array['gridster_shortcode'] = plugins_url( '/tinymce/tinymce_gridster_shortcode_plugin.'.$this->minified_js_files.'js', __FILE__ );      
             // for debug only
-            $date = new DateTime();
-            $plugin_array['gridster_shortcode'] = plugins_url( '/tinymce/tinymce_gridster_shortcode_plugin.js?cache=' . $date->getTimestamp(), __FILE__ );
+#            $date = new DateTime();
+#            $plugin_array['gridster_shortcode'] = plugins_url( '/tinymce/tinymce_gridster_shortcode_plugin.js?cache=' . $date->getTimestamp(), __FILE__ );
             return $plugin_array;
         }
         
@@ -1925,14 +1932,12 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @return   array   updated tinymce options with new editor styles appended
          *  
-         *  @todo     remove file caching, used for debugging  
-         *             
          */                                                                              
         public function tiny_mce_before_init ( $editor_styles ) {
-#            $editor_styles['content_css'] .= ',' . plugins_url( '/css/gridster_shortcode_editor-style.'.$this->minified_css_files.'css' , __FILE__ );
+            $editor_styles['content_css'] .= ',' . plugins_url( '/css/gridster_shortcode_editor-style.'.$this->minified_css_files.'css' , __FILE__ );
             // for debug only
-            $date = new DateTime();
-            $editor_styles['content_css'] .= ',' . plugins_url( '/css/gridster_shortcode_editor-style.css?cache=' . $date->getTimestamp() , __FILE__ );
+#            $date = new DateTime();
+#            $editor_styles['content_css'] .= ',' . plugins_url( '/css/gridster_shortcode_editor-style.css?cache=' . $date->getTimestamp() , __FILE__ );
             return $editor_styles;        
         }
         
