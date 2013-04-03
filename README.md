@@ -9,11 +9,11 @@ Gridster is a WordPress plugin that makes building intuitive draggable layouts f
 
 **Author:**            	Carsten Bach
 
-**Requires at least:** 	3.3
+**Requires at least:** 	3.1
 
 **Tested up to:** 			3.5.1
 
-**Stable tag:** 				1.2
+**Stable tag:** 				1.3
 
 **License:**            GPLv2 or later
 
@@ -134,6 +134,14 @@ Drop me a line at gridster@carsten-bach.de
 
 
 ## Changelog ##
+
+### 1.3 ###
+* Added filter `gridster_overwrite_post_options_with_cap` to define capability, which allows users to overwrite defaull layout settings for each gridster individually
+* CSS adjustment of the Style selector width
+
+### 1.2.1 ###
+* Removed some debugging code to avoid Fatal Error on activation in PHP < 5.3
+
 ### 1.2 ###
 * Added two CSS classes for `<body>`, `.gridster-not-loaded` when shortode is used as a Noscript fallback and `.gridster-loaded` when JS is available and the Layout is loaded properly
 * Fix to use Return key on search-fields inside the post-lists
@@ -177,6 +185,7 @@ You can adjust the behavior of this plugin by using following filters:
 * Adjust the naming convention for used templates by filtering `gridster_locate_templates_from`
 * Add custom CSS classes to each Gridster widget individually from a multiple select field enhanced by [chosen.js](http://harvesthq.github.com/chosen/), using the `gridster_choose_from_custom_css_classes_for_widgets` filter.
   The return of your applied function should be an array() like this `array( 'alignleft' => __('Align text from left'), 'alignright' => __('Align text from right')`, where the array_keys are the CSS classes to apply and the values are the readable text for you or your editors.
+* Change the capability, which allows users to overwrite the default settings for each gridster individually by filtering `gridster_overwrite_post_options_with_cap`. By default "edit_theme_options" is used. 
 
 Have a look inside the plugin file to see, what variables you are able to use within your filter hooks.
 
