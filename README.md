@@ -15,7 +15,7 @@ You can get it also via the [WordPress Plugin Repository](http://wordpress.org/e
 
 **Tested up to:** 			3.5.1
 
-**Stable tag:** 				1.3.1
+**Stable tag:** 				1.3.2
 
 **License:**            GPLv2 or later
 
@@ -139,7 +139,10 @@ Drop me a line at gridster@carsten-bach.de
 
 ## Changelog ##
 
-= 1.3.1 =
+### 1.3.2 ###
+* Fix pagination of posts (of all types) inside widget-blocks
+
+### 1.3.1 ###
 * Fix for not loading any posts (of all types) into there widget-blocks, because search was triggered with searchphrase "null"
 
 ### 1.3 ###

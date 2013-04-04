@@ -787,7 +787,7 @@ $(".gridster li .admin-html-holder a")
      */ 
     $.fn.getPostsByType = function( post_type, paged,  search ) {
         // set defaults
-        search = typeof search !== 'undefined' ? search : '';
+        search = ( typeof search !== 'undefined' && typeof search !== 'object' ) ? search : '';
         // prepare options Array 
         var query_options = {
             
