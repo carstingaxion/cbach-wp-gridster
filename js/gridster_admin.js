@@ -245,7 +245,7 @@ jQuery(function($){
 
         // set defaults
         load_new = typeof load_new !== 'undefined' ? load_new : false;
-        widget_object = typeof widget_object !== 'undefined' ? widget_object : null;        
+        widget_object = typeof widget_object !== 'undefined' ? widget_object : false;        
         
         // prepare options Array 
         var query_options = {
@@ -787,7 +787,7 @@ $(".gridster li .admin-html-holder a")
      */ 
     $.fn.getPostsByType = function( post_type, paged,  search ) {
         // set defaults
-        search = typeof search !== 'undefined' ? search : null;
+        search = typeof search !== 'undefined' ? search : '';
         // prepare options Array 
         var query_options = {
             

@@ -6,7 +6,7 @@ Author URI:       	http://carsten-bach.de
 Author:            	Carsten Bach
 Requires at least: 	3.2
 Tested up to: 			3.5.1
-Stable tag: 				1.3
+Stable tag: 				1.3.1
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -117,6 +117,9 @@ Drop me a line at gridster@carsten-bach.de
 
 == Changelog ==
 
+= 1.3.1 =
+* Fix for not loading any posts (of all types) into there widget-blocks, because search was triggered with searchphrase "null"
+
 = 1.3 =
 * Added filter `gridster_overwrite_post_options_with_cap` to define capability, which allows users to overwrite defaull layout settings for each gridster individually
 * CSS adjustment of the Style selector width
@@ -174,7 +177,7 @@ You can adjust the behavior of this plugin by using following filters:
 * Add custom CSS classes to each Gridster widget individually from a multiple select field enhanced by [chosen.js](http://harvesthq.github.com/chosen/), using the `gridster_choose_from_custom_css_classes_for_widgets` filter.
   The return of your applied function should be an array() like this `array( 'alignleft' => __('Align text from left'), 'alignright' => __('Align text from right')`, where the array_keys are the CSS classes to apply and the values are the readable text for you or your editors.
 * Change the capability, which allows users to overwrite the default settings for each gridster individually by filtering `gridster_overwrite_post_options_with_cap`. By default "edit_theme_options" is used.
-* 
+
 
 Have a look inside the plugin file to see, what variables you are able to use within your filter hooks.
 
