@@ -308,8 +308,11 @@ define( 'SCRIPT_DEBUG', true );
                 // save gridster post_metas 
                 add_action( 'save_post', array( &$this, 'save_post' ) );
                 
-                // dlete gridster post_metas on post deletion 
-                add_action( 'delete_post', array( &$this, 'delete_post' ) );                
+                // delete gridster post_metas on post deletion 
+                add_action( 'delete_post', array( &$this, 'delete_post' ) );
+                
+                // update "having-gridster-posts" option after post deletion 
+                add_action( 'after_delete_post', array( &$this, 'after_delete_post' ) );                                
                 
                 // show customized "updated" messages
                 add_filter( 'post_updated_messages', array( &$this, 'post_updated_messages' ) );                          
@@ -468,8 +471,10 @@ define( 'SCRIPT_DEBUG', true );
             if ( $this->current_screen->base == 'post' && $this->current_screen->post_type == $this->cpt_gridster ) {
                 
                 // gridster lib
-#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
-                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.with-extras.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );                
+                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
+#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.with-extras.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
+#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/maxgalbu.jquery.gridster.js', __FILE__ ), $deps, $this->gridster_version );                
+#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/dustmo.jquery.gridster.js', __FILE__ ), $deps, $this->gridster_version );
                 wp_enqueue_script( $this->prefix.'lib_js' );
                 $deps[] = $this->prefix.'lib_js';  
                 
@@ -479,12 +484,12 @@ define( 'SCRIPT_DEBUG', true );
                 $deps[] = 'jquery_jeditable_js';          
                                       
                 // jeditable autogrow extension
-                wp_register_script( 'jquery_jeditable_autogrow_extension_js', plugins_url( '/js/jeditable/jquery.jeditable.autogrow.js', __FILE__ ), $deps, '1.7.1' );
+                wp_register_script( 'jquery_jeditable_autogrow_extension_js', plugins_url( '/js/jeditable/jquery.jeditable.autogrow.'.$this->minified_js_files.'js', __FILE__ ), $deps, '1.7.1' );
                 wp_enqueue_script( 'jquery_jeditable_autogrow_extension_js' );
                 $deps[] = 'jquery_jeditable_autogrow_extension_js';    
                               
                 // autogrow Plugin used for <textarea> of type "autogrow" from jeditable 
-                wp_register_script( 'jquery_autogrow_js', plugins_url( '/js/jeditable/jquery.autogrow.js', __FILE__ ), $deps, '1.2.2' );
+                wp_register_script( 'jquery_autogrow_js', plugins_url( '/js/jeditable/jquery.autogrow.'.$this->minified_js_files.'js', __FILE__ ), $deps, '1.2.2' );
                 wp_enqueue_script( 'jquery_autogrow_js' );
                 $deps[] = 'jquery_autogrow_js';   
 
@@ -807,6 +812,9 @@ define( 'SCRIPT_DEBUG', true );
                     'default'
                 );            
             }
+            
+            // remove "Slug" metabox 'cause we really don't need it
+            remove_meta_box( 'slugdiv', $this->cpt_gridster, 'normal' );
 
             
             // add CSS classes filter for workbench-metabox            
@@ -1032,20 +1040,22 @@ define( 'SCRIPT_DEBUG', true );
          *  @since    1.1
          *  
          */                                                              
-        public function have_gridster_posts ( ) {
-        
+        public function have_gridster_posts ( $on_delete_post = false ) {
+#fb($this->default_settings['have_gridster_posts']);        
+
             // ok, we do have some posts saved yet
-            if( $this->default_settings['have_gridster_posts'] )
+            // and not just deleted one
+            if( $this->default_settings['have_gridster_posts'] && $on_delete_post !== true )
                 return;
                 
             // look for existing posts
             $have_posts = get_posts( array( 'post_type' => $this->cpt_gridster, 'posts_per_page' => -1, 'post_status' => 'any' ) );
+#fb($have_posts);
             
             // update plugin options, if we've posts
-            if ( !empty( $have_posts ) ) {
-                $this->default_settings['have_gridster_posts'] = true;
-                update_option( $this->default_settings_name, $this->default_settings );
-            }
+            $this->default_settings['have_gridster_posts'] = ( empty( $have_posts ) ) ? false : true;
+            update_option( $this->default_settings_name, $this->default_settings );            
+#fb($this->default_settings['have_gridster_posts']);
         }
 
 
@@ -1460,12 +1470,26 @@ define( 'SCRIPT_DEBUG', true );
                 
             // check if the current user is authorised to do this action.            
             $pt = get_post_type_object( $this->cpt_gridster );
-            if ( ! current_user_can(  $pt->cap->edit_post , $post_id ) )
+            if ( ! current_user_can(  $pt->cap->delete_post , $post_id ) )
                 return;
             
             delete_post_meta( $post_id, '_gridster_layout' );
             delete_post_meta( $post_id, '_gridster_query_posts_not_in' );
-            delete_post_meta( $post_id, '_gridster_dimensions' );                         
+            delete_post_meta( $post_id, '_gridster_dimensions' );   
+            
+        }
+        
+        
+        
+        /**
+         *  Update "have-gridster-posts" option to make sure 
+         *  everything is consitent after deletion
+         *  
+         *  @since    1.3
+         *  
+         */                                            
+        public function after_delete_post ( ) {
+            $this->have_gridster_posts( true );        
         }
         
         
@@ -1725,7 +1749,7 @@ define( 'SCRIPT_DEBUG', true );
             );
             
             // do search
-            $s = null;
+            $s = '';
             if ( !empty( $options['search'] ) ) {
                 $s = $options['search'];
                 $gridster_args['s'] = $s;
@@ -1733,7 +1757,7 @@ define( 'SCRIPT_DEBUG', true );
             
             $args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
             $gridster_last = $html = $post_links = null;
-            $gridster_last = new WP_Query($gridster_args);
+            $gridster_last = new WP_Query( $gridster_args );
             
             if( $gridster_last->have_posts() ) : 
 
