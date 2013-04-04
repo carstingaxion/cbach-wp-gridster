@@ -4,7 +4,11 @@ Plugin Name: 			Gridster
 Plugin URI:       https://github.com/carstingaxion/cbach-wp-gridster
 Description:      Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 Author:      			Carsten Bach
+<<<<<<< HEAD
 Version: 					1.2.1
+=======
+Version: 					1.3
+>>>>>>> origin/development
 Author URI:    		http://carsten-bach.de
 */
 
@@ -12,14 +16,9 @@ Author URI:    		http://carsten-bach.de
 if( ! class_exists( 'cbach_wpGridster' ) ) {
     class cbach_wpGridster {
        
-       
+        CONST PHPNEED = '5.0.4';
+        CONST WPNEED = '3.2';
         
-      	/**
-      	 *   For easier overriding we declared some keys here as well as our
-      	 *   settings-tabs array which is populated when registering settings
-      	 *            
-      	 */
-
 
         /**
          *   Basename of this file.
@@ -45,7 +44,11 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @used  when enqueuing scripts & styles
          *   @type  string
          */      	
+<<<<<<< HEAD
         protected $version = '1.2.1';
+=======
+        protected $version = '1.3';
+>>>>>>> origin/development
         
         
         /**
@@ -153,12 +156,24 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       	protected $thumbnail_filter_dimensions = array(); 
         
         
+        /**
+         *  Capability which allows users to overwrite the default layout settings for each gridster
+         *  
+         *  @type   string
+         */
+        protected $overwrite_caps = 'edit_theme_options';
         
+                                              
         /**
          *  Construct the CLASS
          *  
+         *  @todo remove script debug                  
+         *  
          */  
       	public function __construct() {
+
+            // 4 debugging only
+            #define( 'SCRIPT_DEBUG', true );
 
             // Used by some fn, i.e. add_settings_link() later.
             $this->base_name = plugin_basename( __FILE__ ); 
@@ -166,6 +181,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // wether to use concetenated scripts & styles or the developer versions
             $this->minified_js_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
             $this->minified_css_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
+                        
+            // get the capability, which allows user to overwrite the default options per each gridster
+	          $this->overwrite_caps = apply_filters( 'gridster_overwrite_post_options_with_cap', $this->overwrite_caps );
         
             //Hook up to the init action
         		add_action( 'init', array( &$this, 'init' ) );
@@ -275,7 +293,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 // Make new gridster columns sortable
                 add_filter( 'manage_edit-gridster_sortable_columns', array( &$this, 'gridster_sortable_columns' ) );
 
-		            // Add copy-able shortcode to "publish"-meta_box of post.php and edit.php
+		            // Modify Quick-edit Links
+                add_filter( 'post_row_actions', array( &$this, 'gridster_post_row_actions' ), 10, 2 );
+                
+                // Add copy-able shortcode to "publish"-meta_box of post.php and edit.php
                 add_action( 'post_submitbox_misc_actions', array( &$this, 'add_shortcode_to_publish_metabox' ), 999 );
 
                 // Add Settings Page
@@ -293,8 +314,11 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 // save gridster post_metas 
                 add_action( 'save_post', array( &$this, 'save_post' ) );
                 
-                // dlete gridster post_metas on post deletion 
-                add_action( 'delete_post', array( &$this, 'delete_post' ) );                
+                // delete gridster post_metas on post deletion 
+                add_action( 'delete_post', array( &$this, 'delete_post' ) );
+                
+                // update "having-gridster-posts" option after post deletion 
+                add_action( 'after_delete_post', array( &$this, 'after_delete_post' ) );                                
                 
                 // show customized "updated" messages
                 add_filter( 'post_updated_messages', array( &$this, 'post_updated_messages' ) );                          
@@ -453,8 +477,10 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             if ( $this->current_screen->base == 'post' && $this->current_screen->post_type == $this->cpt_gridster ) {
                 
                 // gridster lib
-#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
-                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.with-extras.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );                
+                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
+#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.with-extras.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
+#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/maxgalbu.jquery.gridster.js', __FILE__ ), $deps, $this->gridster_version );                
+#                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/dustmo.jquery.gridster.js', __FILE__ ), $deps, $this->gridster_version );
                 wp_enqueue_script( $this->prefix.'lib_js' );
                 $deps[] = $this->prefix.'lib_js';  
                 
@@ -464,12 +490,12 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 $deps[] = 'jquery_jeditable_js';          
                                       
                 // jeditable autogrow extension
-                wp_register_script( 'jquery_jeditable_autogrow_extension_js', plugins_url( '/js/jeditable/jquery.jeditable.autogrow.js', __FILE__ ), $deps, '1.7.1' );
+                wp_register_script( 'jquery_jeditable_autogrow_extension_js', plugins_url( '/js/jeditable/jquery.jeditable.autogrow.'.$this->minified_js_files.'js', __FILE__ ), $deps, '1.7.1' );
                 wp_enqueue_script( 'jquery_jeditable_autogrow_extension_js' );
                 $deps[] = 'jquery_jeditable_autogrow_extension_js';    
                               
                 // autogrow Plugin used for <textarea> of type "autogrow" from jeditable 
-                wp_register_script( 'jquery_autogrow_js', plugins_url( '/js/jeditable/jquery.autogrow.js', __FILE__ ), $deps, '1.2.2' );
+                wp_register_script( 'jquery_autogrow_js', plugins_url( '/js/jeditable/jquery.autogrow.'.$this->minified_js_files.'js', __FILE__ ), $deps, '1.2.2' );
                 wp_enqueue_script( 'jquery_autogrow_js' );
                 $deps[] = 'jquery_autogrow_js';   
 
@@ -740,6 +766,27 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
               'date'       => 'date',                                   
             );
         }
+        
+        
+
+        /**
+         *  Remove "Quick-Edit" and "Preview" Links from post-rows on edit.php
+         *  
+         *  @since    1.3
+         *  
+         *  @param    array   post row actions
+         *  @param    obj     $post-object of current post
+         *  
+         *  @return   array   updated post row actions
+         *  
+         */                                                                                         
+        public function gridster_post_row_actions( $actions, $post ) {
+            if ( $post->post_type == $this->cpt_gridster ) {
+                unset( $actions['inline hide-if-no-js'] );
+                unset( $actions['view'] );
+            }
+            return $actions;
+        }        
 
 
 
@@ -780,15 +827,23 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 'high'
             );
             
-            // add "Options" meta box to gridster post_types
-	          add_meta_box( 
-                'gridster_options_metabox', 
-                __( 'Gridster - Layout options', 'cbach-wp-gridster' ), 
-                array( &$this, 'gridster_options_meta_box' ), 
-                $this->cpt_gridster, 
-                'side', 
-                'default'
-            );
+            // add "Layout Options" meta box to gridster post_types
+            // if current user has capabilities to overwrite default settings
+            if ( current_user_can( $this->overwrite_caps ) ) {
+                add_meta_box( 
+                    'gridster_options_metabox', 
+                    __( 'Gridster - Layout options', 'cbach-wp-gridster' ), 
+                    array( &$this, 'gridster_options_meta_box' ), 
+                    $this->cpt_gridster, 
+                    'side', 
+                    'default'
+                );            
+            }
+            
+            // remove "Slug" metabox 'cause we really don't need it
+            remove_meta_box( 'slugdiv', $this->cpt_gridster, 'normal' );
+
+            
             // add CSS classes filter for workbench-metabox            
             add_filter( 'postbox_classes_gridster_gridster_workbench_metabox', array( &$this, 'postbox_classes_post_gridster_workbench_metabox' ) );
         }
@@ -1012,20 +1067,18 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  @since    1.1
          *  
          */                                                              
-        public function have_gridster_posts ( ) {
-        
+        public function have_gridster_posts ( $after_delete_post = false ) {
             // ok, we do have some posts saved yet
-            if( $this->default_settings['have_gridster_posts'] )
+            // and not just deleted one
+            if( $this->default_settings['have_gridster_posts'] === true && $after_delete_post !== true )
                 return;
                 
             // look for existing posts
             $have_posts = get_posts( array( 'post_type' => $this->cpt_gridster, 'posts_per_page' => -1, 'post_status' => 'any' ) );
-            
+
             // update plugin options, if we've posts
-            if ( !empty( $have_posts ) ) {
-                $this->default_settings['have_gridster_posts'] = true;
-                update_option( $this->default_settings_name, $this->default_settings );
-            }
+            $this->default_settings['have_gridster_posts'] = ( empty( $have_posts ) ) ? false : true;
+            update_option( $this->default_settings_name, $this->default_settings );            
         }
 
 
@@ -1412,7 +1465,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // save our data
             update_post_meta( $post_id, '_gridster_query_posts_not_in', $query_posts_not_in);
             update_post_meta( $post_id, '_gridster_layout', $gridster_layout);
-            if ( !empty( $dimensions ) )
+            
+            // check for existence of data AND user capabilites
+            if ( !empty( $dimensions ) && current_user_can( $this->overwrite_caps ) )
                 update_post_meta( $post_id, '_gridster_dimensions', $dimensions );             
             
         }                                                                                   
@@ -1438,12 +1493,26 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 
             // check if the current user is authorised to do this action.            
             $pt = get_post_type_object( $this->cpt_gridster );
-            if ( ! current_user_can(  $pt->cap->edit_post , $post_id ) )
+            if ( ! current_user_can(  $pt->cap->delete_post , $post_id ) )
                 return;
             
             delete_post_meta( $post_id, '_gridster_layout' );
             delete_post_meta( $post_id, '_gridster_query_posts_not_in' );
-            delete_post_meta( $post_id, '_gridster_dimensions' );                         
+            delete_post_meta( $post_id, '_gridster_dimensions' );   
+            
+        }
+        
+        
+        
+        /**
+         *  Update "have-gridster-posts" option to make sure 
+         *  everything is consitent after deletion
+         *  
+         *  @since    1.3
+         *  
+         */                                            
+        public function after_delete_post ( ) {
+            $this->have_gridster_posts( true );        
         }
         
         
@@ -1703,7 +1772,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             );
             
             // do search
-            $s = null;
+            $s = '';
             if ( !empty( $options['search'] ) ) {
                 $s = $options['search'];
                 $gridster_args['s'] = $s;
@@ -1711,7 +1780,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             
             $args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
             $gridster_last = $html = $post_links = null;
-            $gridster_last = new WP_Query($gridster_args);
+            $gridster_last = new WP_Query( $gridster_args );
             
             if( $gridster_last->have_posts() ) : 
 
@@ -2104,20 +2173,29 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @return   bool    wether the $post is visible to the user or not
          *  
-         *  @todo     Check for other post_statuses also : private, protected, sheduled, etc.                  
-         *  
          */
         private function is_visible ( $post_id ) {
         
-            //
+            // get $post object by ID
             $post = get_post( $post_id );
+            
+            // if $post does not exist
+            if ( !is_object( $post ) || empty( $post ) )
+                return false;
             
             // if public, everything is fine
             if ( $post->post_status == 'publish' )
                 return true;
             
-            // check if the current user is authorised to do this action.            
+            // check if the current user is authorised to do this action.
+            // get post_type object            
             $pt = get_post_type_object( $post->post_type );
+
+            // read private posts?
+            if ( current_user_can(  $pt->cap->read_private_posts , $post_id ) )
+                return true;
+
+            // edit posts?
             if ( current_user_can(  $pt->cap->edit_post , $post_id ) )
                 return true;
                 
