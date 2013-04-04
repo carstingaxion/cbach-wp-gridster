@@ -1024,6 +1024,25 @@ jQuery(document).ready(function($) {
     });
 */   
 
-
+    /**
+     *  Remove some edit elements form post.php and post-new.php
+     *  that can't be removed elsewhere via hooks or filters
+     *  
+     *  Removes
+     *  - Radio Button  "password protect" a post 
+     *  
+     *  @since    1.3
+     *  
+     */
+    var elements_to_remove = [
+        'input#visibility-radio-password',
+        'label[for="visibility-radio-password"] + br',
+        'label[for="visibility-radio-password"]',
+        'span#password-span'    
+    ];
+    $.each( elements_to_remove, function ( i, v ) {
+        $( v ).remove();
+    });                                            
+    
             
 });
