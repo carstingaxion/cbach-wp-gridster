@@ -3,13 +3,15 @@
 ## Description ##
 Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 
+You can get it also via the [WordPress Plugin Repository](http://wordpress.org/extend/plugins/cbach-wp-gridster/).
+
 **Tags:** 							grid layout, GUI, gridster, layout management, drag & drop, grid, multi-column, columns, magazine, user-friendly, shortcode
 
 **Author URI:**       	http://carsten-bach.de
 
 **Author:**            	Carsten Bach
 
-**Requires at least:** 	3.1
+**Requires at least:** 	3.2
 
 **Tested up to:** 			3.5.1
 
@@ -145,6 +147,7 @@ Drop me a line at gridster@carsten-bach.de
 * Fix: Searchfield had value of "null", if you did no search
 * Removed meta_box for the post_slug on this post_type because we really don't need it
 * Fix for using "Return" on the searchform, to avoid the saving of the current gridster and relaoding the page
+* Removed "Preview"-Link, "Quick Edit"-Link and option to password protect gridster-posts
  
  
 ### 1.2.1 ###

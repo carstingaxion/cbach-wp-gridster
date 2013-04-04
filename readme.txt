@@ -4,7 +4,7 @@ Donate link: 				https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_butt
 Tags: 							grid layout, GUI, gridster, layout management, drag & drop, grid, multi-column, columns, magazine, user-friendly, shortcode
 Author URI:       	http://carsten-bach.de
 Author:            	Carsten Bach
-Requires at least: 	3.1
+Requires at least: 	3.2
 Tested up to: 			3.5.1
 Stable tag: 				1.3
 License:            GPLv2 or later
@@ -17,7 +17,7 @@ Use Gridster to manage your content with ease in a customizable grid.
 == Description ==
 Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 
-You can [fork Gridster at Github](https://github.com/carstingaxion/cbach-wp-gridster) or tell me about your [issues](https://github.com/carstingaxion/cbach-wp-gridster/issues).
+You can fork [Gridster at Github](https://github.com/carstingaxion/cbach-wp-gridster) or tell me about your [issues](https://github.com/carstingaxion/cbach-wp-gridster/issues).
 
 
 = General - Features =
@@ -125,6 +125,7 @@ Drop me a line at gridster@carsten-bach.de
 * Fix: Searchfield had value of "null", if you did no search
 * Removed meta_box for the post_slug on this post_type because we really don't need it
 * Fix for using "Return" on the searchform, to avoid the saving of the current gridster and relaoding the page
+* Removed "Preview"-Link, "Quick Edit"-Link and option to password protect gridster-posts
 
 = 1.2.1 =
 * Removed some debugging code to avoid Fatal Error on activation in PHP < 5.3
@@ -191,7 +192,7 @@ Have a look inside the plugin file to see, what variables you are able to use wi
 * The guys of [Ducksboard](http://ducksboard.com/) and the many github Contributors for their work on [gridster.js](https://github.com/ducksboard/gridster.js)
 * [Mika Tuupola](http://www.appelsiini.net/) for his work on [Jeditable](http://www.appelsiini.net/projects/jeditable)
 * [Yusuke Kamiyamane](http://p.yusukekamiyamane.com/) for his [Diagona Icons](http://www.iconfinder.com/iconsets/diagona) licensed under [Creative Commons (Attribution 3.0 Unported)](http://creativecommons.org/licenses/by/3.0/)
-* [MidTone Design](http://www.midtonedesign.com/portfolio/category/portfolio/) for their [Web Injection Icons)[http://www.iconfinder.com/iconsets/webinjection]
+* [MidTone Design](http://www.midtonedesign.com/portfolio/category/portfolio/) for their [Web Injection Icons](http://www.iconfinder.com/iconsets/webinjection)
 * [Dmitry Costenco](http://www.aha-soft.com/) for his [Free Applications Icons](http://www.iconfinder.com/iconsets/freeapplication)
 * [New Moon](http://code.google.com/u/newmooon/) for their [Ultimate Gnome Icons](http://www.iconfinder.com/iconsets/UltimateGnome)
 * [Harvest](http://www.getharvest.com/) for developing [chosen.js](http://harvesthq.github.com/chosen/) a Javascript Plugin to make `<select>`s more user-friendly
