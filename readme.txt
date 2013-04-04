@@ -17,7 +17,7 @@ Use Gridster to manage your content with ease in a customizable grid.
 == Description ==
 Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 
-You can [fork Gridster at Github](https://github.com/carstingaxion/cbach-wp-gridster/fork) or tell me about your [issues](https://github.com/carstingaxion/cbach-wp-gridster/issues).
+You can [fork Gridster at Github](https://github.com/carstingaxion/cbach-wp-gridster) or tell me about your [issues](https://github.com/carstingaxion/cbach-wp-gridster/issues).
 
 
 = General - Features =
@@ -120,6 +120,11 @@ Drop me a line at gridster@carsten-bach.de
 = 1.3 =
 * Added filter `gridster_overwrite_post_options_with_cap` to define capability, which allows users to overwrite defaull layout settings for each gridster individually
 * CSS adjustment of the Style selector width
+* Fix for updating the height of the gridster element, during resize of gridster-widgets
+* Fix for not being able to resize a gridster-widget below the very last row. Works now ;)
+* Fix: Searchfield had value of "null", if you did no search
+* Removed meta_box for the post_slug on this post_type because we really don't need it
+* Fix for using "Return" on the searchform, to avoid the saving of the current gridster and relaoding the page
 
 = 1.2.1 =
 * Removed some debugging code to avoid Fatal Error on activation in PHP < 5.3
@@ -189,4 +194,4 @@ Have a look inside the plugin file to see, what variables you are able to use wi
 * [MidTone Design](http://www.midtonedesign.com/portfolio/category/portfolio/) for their [Web Injection Icons)[http://www.iconfinder.com/iconsets/webinjection]
 * [Dmitry Costenco](http://www.aha-soft.com/) for his [Free Applications Icons](http://www.iconfinder.com/iconsets/freeapplication)
 * [New Moon](http://code.google.com/u/newmooon/) for their [Ultimate Gnome Icons](http://www.iconfinder.com/iconsets/UltimateGnome)
-* [Harvest](http://www.getharvest.com/) for developing [chosen.js](http://harvesthq.github.com/chosen/) a Javascript Plugin to make <select>s more user-friendly
+* [Harvest](http://www.getharvest.com/) for developing [chosen.js](http://harvesthq.github.com/chosen/) a Javascript Plugin to make `<select>`s more user-friendly
