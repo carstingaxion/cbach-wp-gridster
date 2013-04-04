@@ -4,11 +4,7 @@ Plugin Name: 			Gridster
 Plugin URI:       https://github.com/carstingaxion/cbach-wp-gridster
 Description:      Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
 Author:      			Carsten Bach
-<<<<<<< HEAD
-Version: 					1.2.1
-=======
 Version: 					1.3
->>>>>>> origin/development
 Author URI:    		http://carsten-bach.de
 */
 
@@ -44,11 +40,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @used  when enqueuing scripts & styles
          *   @type  string
          */      	
-<<<<<<< HEAD
-        protected $version = '1.2.1';
-=======
         protected $version = '1.3';
->>>>>>> origin/development
         
         
         /**

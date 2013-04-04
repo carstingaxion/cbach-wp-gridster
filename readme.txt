@@ -6,11 +6,7 @@ Author URI:       	http://carsten-bach.de
 Author:            	Carsten Bach
 Requires at least: 	3.2
 Tested up to: 			3.5.1
-<<<<<<< HEAD
-Stable tag: 				1.2.1
-=======
 Stable tag: 				1.3
->>>>>>> origin/development
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -120,8 +116,6 @@ Drop me a line at gridster@carsten-bach.de
 
 
 == Changelog ==
-<<<<<<< HEAD
-=======
 
 = 1.3 =
 * Added filter `gridster_overwrite_post_options_with_cap` to define capability, which allows users to overwrite defaull layout settings for each gridster individually
@@ -133,7 +127,6 @@ Drop me a line at gridster@carsten-bach.de
 * Fix for using "Return" on the searchform, to avoid the saving of the current gridster and relaoding the page
 * Removed "Preview"-Link, "Quick Edit"-Link and option to password protect gridster-posts
 
->>>>>>> origin/development
 = 1.2.1 =
 * Removed some debugging code to avoid Fatal Error on activation in PHP < 5.3
 
