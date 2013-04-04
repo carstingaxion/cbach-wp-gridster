@@ -82,7 +82,6 @@ body.settings_page_gridster_default_options #icon-options-general {
 #gridster_workbench_metabox {
     background: none;
     border: none;
-    margin-top: -2em;
 }
 #gridster_workbench_metabox:after {
     content: '';
@@ -320,7 +319,7 @@ body.settings_page_gridster_default_options #icon-options-general {
 
 
 /*********************************************************************************************************************************************
- *  CPT Gridster post.php - METABOX right column with gridster.js widgets
+ *  CPT Gridster post.php - METABOX right column with gridster.js widgets       #D54E21
  ********************************************************************************************************************************************/
         .gridster {
         
@@ -332,6 +331,11 @@ body.settings_page_gridster_default_options #icon-options-general {
                 overflow: hidden; 
                 z-index: 1;
             }
+            .gridster > ul > li.preview-holder {
+                background-color: #fff;
+                border: 1px dotted #CCC; 
+                opacity: .75
+            }            
             .gridster > ul > li .admin-html-holder {
                 padding: 30px 0;
             }
