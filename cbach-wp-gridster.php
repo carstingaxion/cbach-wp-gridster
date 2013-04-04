@@ -13,14 +13,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
     class cbach_wpGridster {
        
         CONST PHPNEED = '5.0.4';
-        CONST WPNEED = '3.1';
+        CONST WPNEED = '3.2';
         
-      	/**
-      	 *   For easier overriding we declared some keys here as well as our
-      	 *   settings-tabs array which is populated when registering settings
-      	 *            
-      	 */
-
 
         /**
          *   Basename of this file.
@@ -170,7 +164,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          */  
       	public function __construct() {
 
-define( 'SCRIPT_DEBUG', true );
+#define( 'SCRIPT_DEBUG', true );
 
             // Used by some fn, i.e. add_settings_link() later.
             $this->base_name = plugin_basename( __FILE__ ); 
@@ -290,7 +284,10 @@ define( 'SCRIPT_DEBUG', true );
                 // Make new gridster columns sortable
                 add_filter( 'manage_edit-gridster_sortable_columns', array( &$this, 'gridster_sortable_columns' ) );
 
-		            // Add copy-able shortcode to "publish"-meta_box of post.php and edit.php
+		            // Modify Quick-edit Links
+                add_filter( 'post_row_actions', array( &$this, 'gridster_post_row_actions' ), 10, 2 );
+                
+                // Add copy-able shortcode to "publish"-meta_box of post.php and edit.php
                 add_action( 'post_submitbox_misc_actions', array( &$this, 'add_shortcode_to_publish_metabox' ), 999 );
 
                 // Add Settings Page
@@ -760,6 +757,27 @@ define( 'SCRIPT_DEBUG', true );
               'date'       => 'date',                                   
             );
         }
+        
+        
+
+        /**
+         *  Remove "Quick-Edit" and "Preview" Links from post-rows on edit.php
+         *  
+         *  @since    1.3
+         *  
+         *  @param    array   post row actions
+         *  @param    obj     $post-object of current post
+         *  
+         *  @return   array   updated post row actions
+         *  
+         */                                                                                         
+        public function gridster_post_row_actions( $actions, $post ) {
+            if ( $post->post_type == $this->cpt_gridster ) {
+                unset( $actions['inline hide-if-no-js'] );
+                unset( $actions['view'] );
+            }
+            return $actions;
+        }        
 
 
 
@@ -1040,22 +1058,18 @@ define( 'SCRIPT_DEBUG', true );
          *  @since    1.1
          *  
          */                                                              
-        public function have_gridster_posts ( $on_delete_post = false ) {
-#fb($this->default_settings['have_gridster_posts']);        
-
+        public function have_gridster_posts ( $after_delete_post = false ) {
             // ok, we do have some posts saved yet
             // and not just deleted one
-            if( $this->default_settings['have_gridster_posts'] && $on_delete_post !== true )
+            if( $this->default_settings['have_gridster_posts'] === true && $after_delete_post !== true )
                 return;
                 
             // look for existing posts
             $have_posts = get_posts( array( 'post_type' => $this->cpt_gridster, 'posts_per_page' => -1, 'post_status' => 'any' ) );
-#fb($have_posts);
-            
+
             // update plugin options, if we've posts
             $this->default_settings['have_gridster_posts'] = ( empty( $have_posts ) ) ? false : true;
             update_option( $this->default_settings_name, $this->default_settings );            
-#fb($this->default_settings['have_gridster_posts']);
         }
 
 
@@ -2150,20 +2164,29 @@ define( 'SCRIPT_DEBUG', true );
          *  
          *  @return   bool    wether the $post is visible to the user or not
          *  
-         *  @todo     Check for other post_statuses also : private, protected, sheduled, etc.                  
-         *  
          */
         private function is_visible ( $post_id ) {
         
-            //
+            // get $post object by ID
             $post = get_post( $post_id );
+            
+            // if $post does not exist
+            if ( !is_object( $post ) || empty( $post ) )
+                return false;
             
             // if public, everything is fine
             if ( $post->post_status == 'publish' )
                 return true;
             
-            // check if the current user is authorised to do this action.            
+            // check if the current user is authorised to do this action.
+            // get post_type object            
             $pt = get_post_type_object( $post->post_type );
+
+            // read private posts?
+            if ( current_user_can(  $pt->cap->read_private_posts , $post_id ) )
+                return true;
+
+            // edit posts?
             if ( current_user_can(  $pt->cap->edit_post , $post_id ) )
                 return true;
                 
