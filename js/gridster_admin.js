@@ -9,6 +9,7 @@ jQuery(function($){
      *  
      */
     var gridster;
+    var gridster_height;
     var grid_size_x = parseInt( gridster_admin.widget_base_width, 10 );
     var grid_size_y = parseInt( gridster_admin.widget_base_height, 10 );    
     var grid_margin_x = parseInt( gridster_admin.widget_margin_x, 10 );
@@ -31,6 +32,8 @@ jQuery(function($){
             grid_h++;
         }
         gridster.resize_widget(elmObj, grid_w, grid_h);
+        gridster.set_dom_grid_height();	        
+        
     };
     
     
@@ -73,15 +76,38 @@ jQuery(function($){
         maxHeight: ( ( grid_size_y + (grid_margin_y * 2) ) * max_size_y ),
         aspectRatio: gridster_admin.resizable_aspect_ratio,    
     */    
-        containment: '.gridster ul',
+        // not using containment fixes the bug, 
+        // to not being able to resize to very last bottom row
+        //containment: '.gridster ul',
         handles: 'se',
         autoHide: true,
+        start: function(event, ui) {
+            gridster_height = gridster.$el.height();
+        },
         resize: function (event, ui) {
             // only if images exist, mark as "updating"
             if ( $(this).find('img').length ) {
                 // mark widget as "in update progress"
                 $(this).addClass('isUpdated');
             }
+          	//set new ul.gridster height along the dragging period
+          	var delta = grid_size_y + grid_margin_y * 2;	        	
+            // we need event property offsetY, 
+            // but firefox bugs with this
+            // so we set this by our own
+            // @see http://bugs.jquery.com/ticket/8523#comment:16
+            if(typeof event.offsetX === "undefined" || typeof event.offsetY === "undefined") {
+               var targetOffset = $(event.target).offset();
+               event.offsetX = event.pageX - targetOffset.left;
+               event.offsetY = event.pageY - targetOffset.top;
+            }
+            // if the widget will be taller than before, 
+            // add some space to the gridster workbench
+            if ( event.offsetY > gridster.$el.height() ) {
+            		var extra = Math.floor( (event.offsetY - gridster_height) / delta + 1 );
+    	        	var new_height = gridster_height + extra * delta;
+    	        	gridster.$el.css( 'height', new_height );
+          	}            
         },
         stop: function(event, ui) {
             var resized = $(this);
@@ -99,9 +125,19 @@ jQuery(function($){
         }
     };
 
-var chosen_opts = {
-    no_results_text: gridster_admin.chosenNoResultsText
-};
+
+
+    /**
+     *  Define defaults for chosen.js
+     *  
+     *  @since    1.2
+     *  
+     */                        
+    var chosen_opts = {
+        no_results_text: gridster_admin.chosenNoResultsText
+    };
+
+
 
     /**
      *  Setup gridster
@@ -110,9 +146,6 @@ var chosen_opts = {
      *  @see    http://gridster.net/docs/
      *  
      *  @since  1.0
-     *  
-     *  @todo
-                          
      *  
      */                            
     gridster = $('.gridster ul').gridster({
@@ -814,11 +847,15 @@ $(".gridster li .admin-html-holder a")
             }
         }); 
     };
+    
+    
     // load lists of all post_types on load
     $('.gridster_widget-block').each( function(  ) {
         var post_type = $(this).data('post_type');
         $.fn.getPostsByType( post_type, paged = 1 );
     });
+    
+    
     // load paged list of posts on paging-click
     $(document).on( 'click', '.widget-blocks-pagination', function(){
         $(this).parentsUntil('.gridster_widget-block').parent().find('.spinner').show();
@@ -827,6 +864,8 @@ $(".gridster li .admin-html-holder a")
         var search = ( $(this).data('search') ) ? $(this).data('search') : null;  
         $.fn.getPostsByType( post_type, paged, search );    
     });
+    
+    
     // load search-list of posts
     //setup before functions
     //timer identifier
@@ -834,27 +873,37 @@ $(".gridster li .admin-html-holder a")
     //time in ms, 2 second for example                
     var doneTypingInterval = 2000;  
     
-    //on keyup, start the countdown
-    $(document).on( 'keyup', '.gridster_search-posts-by-type', function( e ){
-        var input = $(this);    
+    
+    //on all key-events disable RETURN to avoid reloading the page and saving the current gridster
+    $(document).on( 'keydown', '.gridster_search-posts-by-type', function( e ){ 
         // disable "Enter" on search forms, to prevent WordPress from starting the save hook
         if ( e.which == 13 ) {
             // prevent post-form submission
             e.preventDefault();        
+        }    
+    });
+     
+    //on keydown, clear the countdown 
+    $(document).on( 'keydown', '.gridster_search-posts-by-type', function( e ){
+        // reset timer
+        clearTimeout( typingTimer );  
+    });
+
+
+    //on keyup, start the countdown or starts earch on "RETURN"
+    $(document).on( 'keyup', '.gridster_search-posts-by-type', function( e ){
+        var input = $(this);    
+        // disable "Enter" on search forms, to prevent WordPress from starting the save hook
+        if ( e.which == 13 ) {
             // start search right now
             $.fn.doneTyping( input );
         // start timer on every other key
         } else {
             typingTimer = setTimeout( function() { $.fn.doneTyping( input ); }, doneTypingInterval);        
         }
+    });
+  
 
-    });
-    
-    //on keydown, clear the countdown 
-    $(document).on( 'keydown', '.gridster_search-posts-by-type', function(){
-        clearTimeout(typingTimer);
-    });
-    
     //user is "finished typing," get our SERP
     $.fn.doneTyping = function( input ) {
         input.parentsUntil('.gridster_widget-block').parent().find('.spinner').show();
