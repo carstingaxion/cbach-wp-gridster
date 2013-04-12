@@ -1770,7 +1770,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 $gridster_args['s'] = $s;
             }
             
-            $args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
+            $gridster_args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
             $gridster_last = $html = $post_links = null;
             $gridster_last = new WP_Query( $gridster_args );
             
