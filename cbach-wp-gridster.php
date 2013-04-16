@@ -177,7 +177,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       	public function __construct() {
 
             // 4 debugging only
-            define( 'SCRIPT_DEBUG', true );
+#            define( 'SCRIPT_DEBUG', true );
 
             // Used by some fn, i.e. add_settings_link() later.
             $this->base_name = plugin_basename( __FILE__ ); 
