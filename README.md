@@ -95,6 +95,35 @@ Just set the constant `GRIDSTER_FRONTEND_CSS` to false in your themes `functions
 define( 'GRIDSTER_FRONTEND_CSS', false );
 ``` 
 
+### How to get best fitting image-sizes to work? ###
+Gridster uses the generated images used as post-thumbnails by default. When you add existing content to a new gridster, the plugin will look for the best fitting image size, according to the width and height of your current gridster-widget.
+So if you have defined the base width to 100px, base height to 100px and your margins to 10px, the plugin will look for images of 100 * 100 px.
+
+Now, when you resize this gridster-widget to, let's say, 1 row with 2 columns, the plugin will reload this gridster-widget with an image of 220 * 100 px.
+To avoid ugly cropping or unwanted scaling of the post-thumbnails, you go best with defining some additional post-thumbnail sizes within your `functions.php` like so.
+```php
+/**
+ *  Add some additional post-thumbnail sizes, that can be used by the Gridster Plugin
+ *  e.g. we have base-width: 100px, base-height: 100px and margins both 10px
+ *  
+ *  @see    http://codex.wordpress.org/Function_Reference/add_image_size              
+ *            
+ */
+if ( function_exists( 'add_image_size' ) ) { 
+	add_image_size( 'gridster-1col-1row', 100, 100, true ); 
+  
+	add_image_size( 'gridster-2col-1row', 220, 100, true ); 
+	add_image_size( 'gridster-3col-1row', 340, 100, true );
+	add_image_size( 'gridster-4col-1row', 460, 100, true );
+  
+	add_image_size( 'gridster-1col-2row', 100, 220, true );  
+	add_image_size( 'gridster-1col-3row', 100, 340, true );      
+	add_image_size( 'gridster-1col-4row', 100, 460, true );                
+  
+  /** ... and so on ... */
+} 
+```
+
 ###Do you have some question?###
 Drop me a line at gridster@carsten-bach.de
 
@@ -141,6 +170,9 @@ Drop me a line at gridster@carsten-bach.de
 
 ### 1.3.2 ###
 * Fix pagination of posts (of all types) inside widget-blocks
+* Bugfix: for [gridster_get_posts_by_type_query_args filter](http://wordpress.org/support/topic/bug-with-gridster_get_posts_by_type_query_args-filter?replies=2#post-4082745), thanks to [jide.fr](http://wordpress.org/support/profile/jidefr)
+* Added a check for required WordPress- and PHP-Version 
+* Updated F.A.Q. with infos to used image-sizes 
 
 ### 1.3.1 ###
 * Fix for not loading any posts (of all types) into there widget-blocks, because search was triggered with searchphrase "null"
