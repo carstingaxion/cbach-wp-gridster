@@ -12,8 +12,11 @@ Author URI:    		http://carsten-bach.de
 if( ! class_exists( 'cbach_wpGridster' ) ) {
     class cbach_wpGridster {
        
-        CONST PHPNEED = '5.0.4';
-        CONST WPNEED = '3.2';
+        CONST 
+            PHPNEED = '5.0.4',
+            WPNEED = '3.3',
+            NAME = 'Gridster';
+        
         
 
         /**
@@ -60,6 +63,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          */         
         protected $minified_js_files = '';    
         protected $minified_css_files = '';        
+            
              
         /**
          *   Internal prefix for creating CSS classes and ids
@@ -72,7 +76,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         /**
          *   Nonce
          *
-         *   @used  when for verification on save actions
+         *   @used  for verification on save actions
          *   @type  string
          */      	
         protected $nonce = 'gridster_nonce'; 
@@ -155,7 +159,15 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          */
         protected $overwrite_caps = 'edit_theme_options';
         
-                                              
+
+        /**
+         *  Error Handler
+         *  
+         *  @type   array
+         */
+        protected $error_msg = array();  
+        
+                                                                                  
         /**
          *  Construct the CLASS
          *  
@@ -165,7 +177,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       	public function __construct() {
 
             // 4 debugging only
-            #define( 'SCRIPT_DEBUG', true );
+            define( 'SCRIPT_DEBUG', true );
 
             // Used by some fn, i.e. add_settings_link() later.
             $this->base_name = plugin_basename( __FILE__ ); 
@@ -177,20 +189,27 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // get the capability, which allows user to overwrite the default options per each gridster
 	          $this->overwrite_caps = apply_filters( 'gridster_overwrite_post_options_with_cap', $this->overwrite_caps );
         
-            //Hook up to the init action
-        		add_action( 'init', array( &$this, 'init' ) );
-      
-            // Register Post_type staging
-            add_action( 'init', array( &$this, 'gridster_register_as_posttype' ) ); 
-
-		        // get settings
-            add_action( 'init', array( &$this, 'load_settings' ) );
+    				// show errors the WP way
+            add_action( 'admin_notices', array( &$this, 'admin_notices' ) );
             
-            // check if there are any existing gridster posts
-            add_action( 'init', array( &$this, 'have_gridster_posts' ) );
+            // check requirements
+            if ( $this->check_dependencies() === true ) {
             
-            // set constants and settings after the theme, so users can overwrite them easily
-            add_action( 'after_setup_theme', array( &$this, 'after_setup_theme' ) );
+                //Hook up to the init action
+            		add_action( 'init', array( &$this, 'init' ) );
+          
+                // Register Post_type staging
+                add_action( 'init', array( &$this, 'gridster_register_as_posttype' ) ); 
+    
+    		        // get settings
+                add_action( 'init', array( &$this, 'load_settings' ) );
+                
+                // check if there are any existing gridster posts
+                add_action( 'init', array( &$this, 'have_gridster_posts' ) );
+                
+                // set constants and settings after the theme, so users can overwrite them easily
+                add_action( 'after_setup_theme', array( &$this, 'after_setup_theme' ) );            
+            }
         }
       
       
@@ -274,7 +293,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 add_action( 'admin_print_styles', array( &$this, 'admin_css' ) );
 
                 // Append JavaScript(s) to WP BackEnd
-                add_action( 'admin_head', array( &$this, 'admin_js' ) );  
+                add_action( 'admin_enqueue_scripts', array( &$this, 'admin_js' ) );  
 
                 // Add columns to gridster list
                 add_filter( 'manage_edit-gridster_columns', array( &$this, 'gridster_column_header_function' ) );                
@@ -302,7 +321,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 
                 // get current screen object as early as possible
                 add_action( 'current_screen', array( &$this, 'current_screen' ) );
-               
+                               
                 // save gridster post_metas 
                 add_action( 'save_post', array( &$this, 'save_post' ) );
                 
@@ -378,8 +397,25 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          *  @since    1.2
          *  
+         *  @todo     add check for edit-pages of post_type gridster                  
+         *  
          */                                            
         public function after_setup_theme ( ) {
+      
+            global $wp_version;    
+
+            // only in 'wp-admin/post-new.php?post_type=gridster'
+            // or '/wp-admin/post.php'
+#            if ( is_admin() && isset( $_GET['post_type'] ) && $_GET['post_type'] == $this->cpt_gridster ) {
+
+                // in WP < 3.4 the has_post_thumbnail function is only
+                // available if theme supports 'post-thumbnails' feature
+                // to make this Version work with our 'views/gridster-default.php'
+                // we need to add this feature on the 'wp-admin'
+                if ( version_compare( $wp_version, '3.4', '<' ) || ! function_exists( 'has_post_thumbnail' )  ) {
+                    add_theme_support( 'post-thumbnails' );
+                }
+#            }
                     
             // Wether to use frontend CSS or not
             if ( !defined( 'GRIDSTER_FRONTEND_CSS' ) )
@@ -420,8 +456,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 wp_enqueue_style( $this->prefix.'lib_css' );            
             }   
         }
-
-
+        
+        
 
         /**
          *  Adds JavaScript to the WP BE
@@ -462,12 +498,19 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
 #              'max_size_y' => $this->post_settings['dimensions']['max_size_y'],                              
             );            
             
-            // default dependencies for loading our script files
-            $deps = array('jquery', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-resizable' );
-           
+
             // Register our workbench Scripts
             if ( $this->current_screen->base == 'post' && $this->current_screen->post_type == $this->cpt_gridster ) {
-                
+
+                // load depending scripts first
+                wp_enqueue_script( 'jquery' );
+                wp_enqueue_script( 'jquery-ui-draggable' );                
+                wp_enqueue_script( 'jquery-ui-droppable' );                
+                wp_enqueue_script( 'jquery-ui-resizable' );
+    
+                // default dependencies for loading our script files
+                $deps = array('jquery', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-resizable' );
+                             
                 // gridster lib
                 wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
 #                wp_register_script( $this->prefix.'lib_js', plugins_url( '/js/gridster/jquery.gridster.with-extras.'.$this->minified_js_files.'js', __FILE__ ), $deps, $this->gridster_version );
@@ -738,7 +781,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 case 'shortcode' :
                     echo '<input type="text" class="'.$this->prefix.'shortcode-in-list-table" value="['.$this->gridster_shortcode.' id=&quot;'.$post_id.'&quot; title=&quot;'.get_the_title($post_id).'&quot;]" readonly="readonly" onfocus="this.select();">';
                     break;                    
-                    
             }
         }
         
@@ -752,6 +794,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  @return   array   all sortable columns                 
          */         
         public function gridster_sortable_columns() {
+            
             return array(
               'title'      => 'title',
               'author'     => 'author',
@@ -773,6 +816,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                         
         public function gridster_post_row_actions( $actions, $post ) {
+            
             if ( $post->post_type == $this->cpt_gridster ) {
                 unset( $actions['inline hide-if-no-js'] );
                 unset( $actions['view'] );
@@ -789,7 +833,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
     		 *           
     		 */
     		function add_shortcode_to_publish_metabox() {
-    		    global $post;
+    		    
+            global $post;
             
             if ( $this->cpt_gridster != get_post_type( $post->ID ) )
                 return;
@@ -856,6 +901,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                                           
         function postbox_classes_post_gridster_workbench_metabox( $classes ) {
+            
             // In order to ensure we don't duplicate classes, we should
             // check to make sure it's not already in the array 
             if( !in_array( 'two-columns', $classes ) )
@@ -1042,7 +1088,6 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
 #              'max_size_y' => 6, 
 #              'resizable_aspect_ratio' => false,  
                'chosen_select_options' => apply_filters( 'gridster_choose_from_custom_css_classes_for_widgets', array() ),
-#               'chosen_select_options' => apply_filters( 'gridster_choose_from_custom_css_classes_for_widgets', array( 'alignleft' => __('Align Text from left'), 'alignright' => __('Align Text from right') ) ),                                  
           	);
         }
 
@@ -1060,6 +1105,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                              
         public function have_gridster_posts ( $after_delete_post = false ) {
+            
             // ok, we do have some posts saved yet
             // and not just deleted one
             if( $this->default_settings['have_gridster_posts'] === true && $after_delete_post !== true )
@@ -1147,6 +1193,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                        
         public function admin_menu () {
+             
              // Add Settings page to default Settings Menu
           	 add_options_page(
                 __( 'Gridster Default Options', 'cbach-wp-gridster' ),
@@ -1173,7 +1220,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                  
         public function settings_page () {
-        		$tab = isset( $_GET['tab'] ) ? $_GET['tab'] : $this->default_settings_name;
+        		
+            $tab = isset( $_GET['tab'] ) ? $_GET['tab'] : $this->default_settings_name;
         		?>
         		<div class="wrap">
         			<?php $this->plugin_options_tabs(); ?>
@@ -1199,8 +1247,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
       	 *          
       	 */
       	public function plugin_options_tabs() {
-      		$current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : $this->default_settings_name;
-      
+      		
+          $current_tab = isset( $_GET['tab'] ) ? $_GET['tab'] : $this->default_settings_name;
       		screen_icon();
       		echo '<h2 class="nav-tab-wrapper">';
       		foreach ( $this->plugin_settings_tabs as $tab_key => $tab_caption ) {
@@ -1316,6 +1364,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */
         public function settings_default_section_helptext () {
+            
             _e( 'Enter the default layout-settings, used by every gridster.', 'cbach-wp-gridster' );
             _e( 'You can alter theese settings for every gridster on its edit-page.', 'cbach-wp-gridster' );            
         }        
@@ -1406,6 +1455,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                
         public function settings_text_input( $args ) {
+            
             $id =  esc_attr( $this->default_settings_name.'-'.$args['name'] );
             $name = esc_attr( $this->default_settings_name.'['.$args['name'].']' );
             $value = esc_attr( $this->default_settings[$args['name']] );
@@ -1504,6 +1554,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                            
         public function after_delete_post ( ) {
+            
             $this->have_gridster_posts( true );        
         }
         
@@ -1524,10 +1575,13 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                                                    
         public function post_edit_form_tag () {
+            
             global $post;
+            
             // check if we're on the right post_type 
             if ( $this->cpt_gridster != $post->post_type ) 
                 return;
+            
             echo ' autocomplete="off"';
         }
 
@@ -1567,29 +1621,44 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // end if there is no $post->ID
             if ( ! absint( $options['post_id'] ) )
                 die();            
-            
-            // setup $post object
-            $post = get_post( $options['post_id'] );
-            
-            // get widget dimensions to get best fitting images
-            $this->thumbnail_filter_dimensions = array(
-                absint( $options['widget_width'] ),
-                absint( $options['widget_height'] ),                  
-            );
-            
-            // wrapper to separate real html template content
-            // from ui helper on widgets-save 
-            echo '<div class="admin-html-holder">';
-        		
-                // Get and include the template we're going to use
-            		include( $this->get_template_hierarchy( $post ) ); 
-            
-            // end wrapper
-            echo '</div>';
 
+            // prepare WP_Query arguments
+            $ajax_args = array(
+                'p' => $options['post_id'],
+                'post_type' => 'any'    
+            );
+            $ajax_query = new WP_query( $ajax_args );
+            
+            // do we have a post with this ID ? 
+            if( $ajax_query->have_posts() ) :
+               
+               // setup $post object
+               $ajax_query->the_post();
+
+                // get widget dimensions to get best fitting images
+                $this->thumbnail_filter_dimensions = array(
+                    absint( $options['widget_width'] ),
+                    absint( $options['widget_height'] ),                  
+                );
+            
+                // wrapper to separate real html template content
+                // from ui helper on widgets-save 
+                echo '<div class="admin-html-holder">';
+            		
+                    // Get and include the template we're going to use
+                		include( $this->get_template_hierarchy( $post ) ); 
+                
+                // end wrapper
+                echo '</div>';
+            
+            // end have_posts()
+            endif;
+            
+            // reset WP_Query
+            wp_reset_query();
+                        
             // end AJAX request
             die();
-                
         }
 
 
@@ -1770,7 +1839,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 $gridster_args['s'] = $s;
             }
             
-            $args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
+            $gridster_args = apply_filters( 'gridster_get_posts_by_type_query_args', $gridster_args, $pt );
             $gridster_last = $html = $post_links = null;
             $gridster_last = new WP_Query( $gridster_args );
             
@@ -1862,6 +1931,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                     
         public function filter_gridster_post_types_as_widget_blocks ( $post_types ) {
+            
             $new_post_types = array();
             $new_post_types['post'] = 'post';
             $new_post_types['page'] = 'page';
@@ -1881,6 +1951,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                              
         public function plugin_action_links ( $links ) {
+            
             $links[] = '<a href="' . admin_url( 'options-general.php?page=' . $this->default_settings_slug ) . '">'. __('Settings') .'</a>';
             return $links;        
         }
@@ -1932,6 +2003,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                                                                      
         public function filter_image_size_on_ajax_request ( $size ) {
+            
             if ( !empty( $this->thumbnail_filter_dimensions ) && defined( 'DOING_AJAX' ) && constant( 'DOING_AJAX' )  )
                 return $this->thumbnail_filter_dimensions;
             else
@@ -1952,6 +2024,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                 
         public function mce_external_plugins ( $plugin_array ) {
+            
             $plugin_array['gridster_shortcode'] = plugins_url( '/tinymce/tinymce_gridster_shortcode_plugin.'.$this->minified_js_files.'js', __FILE__ );      
             // for debug only
 #            $date = new DateTime();
@@ -1973,6 +2046,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                              
         public function tiny_mce_before_init ( $editor_styles ) {
+            
             $editor_styles['content_css'] .= ',' . plugins_url( '/css/gridster_shortcode_editor-style.'.$this->minified_css_files.'css' , __FILE__ );
             // for debug only
 #            $date = new DateTime();
@@ -1993,7 +2067,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                        
         public function mce_buttons ( $buttons ) {
-          	array_push( $buttons, '|', 'gridster_shortcode' );
+          	
+            array_push( $buttons, '|', 'gridster_shortcode' );
           	return $buttons;
         }
         
@@ -2013,7 +2088,8 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *           
          */
         public function mce_external_languages( $mce_external_languages ) {
-          	$mce_external_languages[ 'gridster_shortcode' ] = plugin_dir_path( __FILE__ ) . 'tinymce/i18n/mce_locale.php';
+          	
+            $mce_external_languages[ 'gridster_shortcode' ] = plugin_dir_path( __FILE__ ) . 'tinymce/i18n/mce_locale.php';
           	return $mce_external_languages;
         }
 
@@ -2030,10 +2106,13 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                                                                
         function body_class( $classes ) {
+            
             global $post;
+            
             if (isset( $post->post_content ) && false !== stripos( $post->post_content, '[' . $this->gridster_shortcode ) ) {
                 array_push( $classes, 'gridster-not-loaded' );
             }
+            
             return $classes;
         }
         
@@ -2116,6 +2195,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  @source   http://stackoverflow.com/a/3353956
          */         
         private function array_insert($arr, $insert, $position) {
+            
             $i = 0;
             foreach ($arr as $key => $value) {
                     if ($i == $position) {
@@ -2136,6 +2216,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */
         private function multidimensional_array_search ( $array, $key_to_look, $value_to_look  ) {
+            
             foreach( $array as $key => $sub_array ) {
                 if( $sub_array[$key_to_look] == $value_to_look) return $key;
             }
@@ -2151,6 +2232,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *  
          */                                            
         public function current_screen ( $current_screen ) {
+            
             $this->current_screen = $current_screen;
         }
         
@@ -2194,8 +2276,72 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             // nothing matched, so hide this post    
             return false;    
         }                                                                                 
+      
         
         
+    		/**
+    		 *  Generate messages for WP_Error Class
+    		 *
+    		 *  @since  1.3.2
+    		 */
+        private function check_dependencies( ) {
+            
+            global $wp_version;
+    				$no_missing_requirement  = true;
+    
+    				if ( ! version_compare ( $wp_version, self::WPNEED, ">=" ) ) {
+    						$no_missing_requirement  = false;
+                $this->error_msg[] = sprintf(
+                    __( 'Please %1$s your wordpress to at least version %2$s.', 'cbach-wp-gridster' )
+                    ,'<a href="' . admin_url( 'update-core.php' ) . '" title="' . __('upgrade', 'cbach-wp-gridster' ) . '">' . __('upgrade', 'cbach-wp-gridster' ) . '</a>'
+                    ,self::WPNEED
+                );
+            }
+    
+    				if ( ! version_compare ( phpversion(), self::PHPNEED, ">=" ) ) {
+    						$no_missing_requirement  = false;
+                $this->error_msg[] = sprintf(
+                    __( 'You need to run at least PHP %1$s.' ,'cbach-wp-gridster' )
+                    ,self::PHPNEED
+                );
+            }
+            
+            return $no_missing_requirement;
+    		}
+    
+    
+    
+    		/**
+    		 *  Trigger WP Error-Handling 
+    		 *
+    		 *  @since  1.3.2
+    		 */
+        public function admin_notices ( ) {
+    
+            settings_errors( );
+    
+            if ( isset( $this->error_msg ) && current_user_can('manage_options') ) {
+                $error_code = sanitize_title_with_dashes( strtolower( self::NAME ) );
+                $errors = new WP_Error( $error_code, $this->error_msg );
+    			      $output =''; $i=0;
+                if ( is_wp_error( $errors ) ) {
+    								foreach( $errors->errors as $k => $v ) {
+    										foreach ( $v[0] as $error_element ) {
+    				                $output.=
+    				                    '<div id="error-'.$k.'-'.$i.'" class="error error-notice error-'.$k.'"><p>'.
+    				                        '<strong>'.self::NAME.'</strong>: '.
+    				                        $error_element.
+    				                    '</p></div>';
+    												$i++;
+    				            }
+    								}
+                    echo $output;
+    						}
+            }
+        }
+    
+    
+            
     } 
 } // if class exists
 
