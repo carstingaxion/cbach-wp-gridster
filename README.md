@@ -11,7 +11,7 @@ You can get it also via the [WordPress Plugin Repository](http://wordpress.org/e
 
 **Author:**            	Carsten Bach
 
-**Requires at least:** 	3.2
+**Requires at least:** 	3.3
 
 **Tested up to:** 			3.5.1
 
