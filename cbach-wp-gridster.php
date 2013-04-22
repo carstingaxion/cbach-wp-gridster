@@ -2492,7 +2492,14 @@ if( class_exists( 'cbach_wpGridster' ) ) {
     // On first activation
     register_activation_hook( __FILE__, array( 'cbach_wpGridster', 'activate' ) );
     // On deactivation
+<<<<<<< HEAD
     register_deactivation_hook( __FILE__, array( 'cbach_wpGridster', 'deactivate' ) ); 
     // On deletion
     register_uninstall_hook( __FILE__, array( 'cbach_wpGridster', 'uninstall' ) );        
 }
+=======
+    register_activation_hook( __FILE__, array( &$cbach_wpGridster, 'deactivate' ) ); 
+    // On delete
+    register_activation_hook( __FILE__, array( &$cbach_wpGridster, 'uninstall' ) );        
+}
+>>>>>>> abca608b0d0a3d4e520f801ff3ebdb34f6c39945
