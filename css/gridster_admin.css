@@ -522,9 +522,12 @@ html#gridster_modal-content {
     line-height: 1.4em;
     color: #333333;
     background-color: #F1F1F1;
+    height: 100%;
 }
 html#gridster_modal-content,
 html#gridster_modal-content body {
+    min-height: 95%;
+    position: relative;
 }
     #gridster_modal-content h2 {
         margin-bottom: .75em;
@@ -564,7 +567,12 @@ html#gridster_modal-content body {
     #gridster_modal-content div.error {
         margin: 3.5em 10%;
     }
-
+    #gridster_modal-content div.mceActionPanel {
+        bottom: 0;
+        margin-top: 5px;
+        position: absolute;
+        width: 100%;
+    }    
 
 
 /******************************************************************************

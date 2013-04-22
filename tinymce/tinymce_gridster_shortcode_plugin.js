@@ -28,9 +28,9 @@
       			});
             
       			// Register commands for shortcode change modal
-      			ed.addCommand('ajax_gridster_shortcode_update_modal', function() {
+      			ed.addCommand('ajax_gridster_shortcode_update_modal', function( u, v ) {
         				ed.windowManager.open({
-                    file: ajaxurl + '?action=ajax_gridster_shortcode_update_modal&nonce=' + ed.getLang('gridster_shortcode.AjaxNonce'),
+                    file: ajaxurl + '?action=ajax_gridster_shortcode_update_modal&nonce=' + ed.getLang('gridster_shortcode.AjaxNonce') + '&selected=' + v,
           					width : 300, 
           					height : 240,
           					title : ed.getLang('gridster_shortcode.popupTitle'), 
@@ -43,25 +43,12 @@
             // Register commands for editing the gridster of the current shortcode
       			ed.addCommand('gridster_edit_current_gridster', function() {
         				var ed = tinymce.activeEditor, el = ed.selection.getNode();
-                // find attr inside encoded shortcode of title-Attribute 
-          			function getAttr(s, n) {
-            				n = new RegExp(n + '=\&quot\;([0-9]+)\&quot\;').exec(s);
-                    return n ? tinymce.DOM.decode(n[1]) : '';
-          			};
                 // is this a gridster shortcode ?
         				if ( el.nodeName == 'IMG' && ed.dom.hasClass(el, 'gridsterShortcodeGUI') ) {
-                    // clone image element
-                    var clone = el.cloneNode(true);
-                    // create temporary parent element
-                    var tmp = document.createElement("div");
-                    // append clone to parent
-                    tmp.appendChild(clone);
-                    // get string representation of element
-                    var stringed_el = tmp.innerHTML; 
-                    // get ID of gridster post from shortcode Attribute
-                    var gridster_id = getAttr(stringed_el, 'id');
+                    // extract gridster post_ID from shortcode attribute 
+                    var gridster_id = ed.plugins.gridster_shortcode._get_gridster_id( el );
                     // get base URL
-                    var path_array = window.location.href.split( 'post.php' );
+                    var path_array = ajaxurl.split( 'admin-ajax.php' );
                     var admin_url = path_array[0];
                     // create edit url with our gridster id as parameter
                     var edit_url = 'post.php?post=' + gridster_id + '&action=edit';
@@ -141,6 +128,29 @@
         				return a;
       			});
     		},
+        
+        //
+        _get_gridster_id : function( el ) {
+            
+            // find attr inside encoded shortcode of title-Attribute 
+      			function getAttr(s, n) {
+        				n = new RegExp(n + '=\&quot\;([0-9]+)\&quot\;').exec(s);
+                return n ? tinymce.DOM.decode(n[1]) : '';
+      			};
+
+            // clone image element
+            var clone = el.cloneNode(true);
+            // create temporary parent element
+            var tmp = document.createElement("div");
+            // append clone to parent
+            tmp.appendChild(clone);
+            // get string representation of element
+            var stringed_el = tmp.innerHTML; 
+            // get ID of gridster post from shortcode Attribute
+            var gridster_id = getAttr(stringed_el, 'id');
+            
+            return gridster_id;
+        },
     
         // Add Edit-Handler Buttons to DOM and add event-handlers
     		_createButtons : function() {
@@ -165,10 +175,17 @@
         				height : '24',
         				title : ed.getLang('gridster_shortcode.changeButton')
       			});
-      			tinymce.dom.Event.add(changeButton, 'mousedown', function(e) {
-        				var ed = tinymce.activeEditor;
-        				ed.execCommand("ajax_gridster_shortcode_update_modal");
-        				ed.plugins.gridster_shortcode._hideButtons();
+      			tinymce.dom.Event.add( changeButton, 'mousedown', function(e) {
+        				var ed = tinymce.activeEditor, el = ed.selection.getNode();
+                // is this a gridster shortcode ?
+        				if ( el.nodeName == 'IMG' && ed.dom.hasClass(el, 'gridsterShortcodeGUI') ) {
+                    // extract gridster post_ID from shortcode attribute 
+                    var gridster_id = ed.plugins.gridster_shortcode._get_gridster_id( el );
+            				// open Modal to pick gridster shortcode from list
+                    ed.execCommand("ajax_gridster_shortcode_update_modal", false, gridster_id );
+            				// hide Edit-handler-Buttons
+                    ed.plugins.gridster_shortcode._hideButtons();                    
+        				}
       			});
       
             // Edit gridster, used by the current shortcode
@@ -179,7 +196,7 @@
         				height : '24',
         				title : ed.getLang('gridster_shortcode.editButton')
       			});
-      			tinymce.dom.Event.add(editButton, 'mousedown', function(e) {
+      			tinymce.dom.Event.add( editButton, 'mousedown', function(e) {
         				var ed = tinymce.activeEditor;
         				ed.execCommand("gridster_edit_current_gridster");
         				// hide Edit-handler-Buttons
@@ -194,7 +211,7 @@
         				height : '24',
         				title : ed.getLang('gridster_shortcode.dellButton')
       			});
-      			tinymce.dom.Event.add(dellButton, 'mousedown', function(e) {
+      			tinymce.dom.Event.add( dellButton, 'mousedown', function(e) {
         				var ed = tinymce.activeEditor, el = ed.selection.getNode();
                 // is this a gridster shortcode ?
         				if ( el.nodeName == 'IMG' && ed.dom.hasClass(el, 'gridsterShortcodeGUI') ) {
