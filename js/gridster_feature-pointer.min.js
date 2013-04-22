@@ -1,0 +1,1 @@
+jQuery(document).ready(function(a){a.each(gridster_Pointers,function(c){b(c)});function b(c){pointer=gridster_Pointers[c];options=a.extend(pointer.options,{close:function(){a.post(ajaxurl,{pointer:pointer.pointer_id,action:"dismiss-wp-pointer"})}});a(pointer.target).pointer(options).pointer("open")}});
