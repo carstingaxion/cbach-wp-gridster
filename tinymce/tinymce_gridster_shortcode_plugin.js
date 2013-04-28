@@ -43,6 +43,9 @@
             // Register commands for editing the gridster of the current shortcode
       			ed.addCommand('gridster_edit_current_gridster', function() {
         				var ed = tinymce.activeEditor, el = ed.selection.getNode();
+                // trigger WP autosave
+                //autosave();
+   
                 // is this a gridster shortcode ?
         				if ( el.nodeName == 'IMG' && ed.dom.hasClass(el, 'gridsterShortcodeGUI') ) {
                     // extract gridster post_ID from shortcode attribute 
@@ -55,6 +58,7 @@
                     // go on and start redirect
                     window.top.location.href = admin_url+edit_url;
         				}
+                
       			});
                         
       			// Register TinyMCE button
