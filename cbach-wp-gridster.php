@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: 			Gridster
- * Plugin URI:        https://github.com/carstingaxion/cbach-wp-gridster
- * Description:       Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
- * Author:      			Carsten Bach
- * Version: 					1.4
- * Author URI:    		http://carsten-bach.de
- * Text Domain:       cbach-wp-gridster
- * License:           GPLv2
+ * Plugin Name:     Gridster
+ * Plugin URI:      https://github.com/carstingaxion/cbach-wp-gridster
+ * Description:     Gridster is a WordPress plugin that makes building intuitive draggable layouts from elements spanning multiple columns. You can even dynamically resize, add and remove elements from the grid, as edit the elements content inline.
+ * Author:          Carsten Bach
+ * Version:         1.4.1
+ * Author URI:      http://carsten-bach.de
+ * Text Domain:     cbach-wp-gridster
+ * License:         GPLv2
  *
  * Copyright 2013
  *
@@ -42,7 +42,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @see   __construct()
          *   @type  string
          */
-        protected $base_name = '';
+        protected $base_name = ''; 
 
         
         /**
@@ -60,7 +60,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
          *   @used  when enqueuing scripts & styles
          *   @type  string
          */      	
-        protected $version = '1.4';
+        protected $version = '1.4.1';
         
         
         /**
@@ -210,9 +210,9 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
             $this->minified_css_files = ( defined('SCRIPT_DEBUG') && constant('SCRIPT_DEBUG') ) ? '' : 'min.';
                         
             // get the capability, which allows user to overwrite the default options per each gridster
-	          $this->overwrite_caps = apply_filters( 'gridster_overwrite_post_options_with_cap', $this->overwrite_caps );
+	        $this->overwrite_caps = apply_filters( 'gridster_overwrite_post_options_with_cap', $this->overwrite_caps );
         
-    				// show errors the WP way
+			// show errors the WP way
             add_action( 'admin_notices', array( &$this, 'admin_notices' ) );
             
             // check requirements
@@ -224,7 +224,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
                 // Register Post_type staging
                 add_action( 'init', array( &$this, 'gridster_register_as_posttype' ) ); 
     
-    		        // get settings
+    		    // get settings
                 add_action( 'init', array( &$this, 'load_settings' ) );
                 
                 // check if there are any existing gridster posts
@@ -1106,7 +1106,7 @@ if( ! class_exists( 'cbach_wpGridster' ) ) {
         
 
 
- 
+/*
 public function feature_pointer( ) {
 
     $screen_id = $this->current_screen->base;
@@ -1145,7 +1145,9 @@ public function feature_pointer( ) {
                 // Add pointer options to script.
                 wp_localize_script( $this->prefix.'feature-pointer', $this->prefix.'Pointers', $this->show_feature_pointers );              
 
-}        
+}
+*/
+        
 /***************************************************************************************************************************************************************************************************
  *
  *  SETTINGS
