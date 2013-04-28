@@ -6,7 +6,7 @@ Author URI:       	http://carsten-bach.de
 Author:            	Carsten Bach
 Requires at least: 	3.3
 Tested up to: 			3.6
-Stable tag: 				1.4
+Stable tag: 				1.4.1
 License:            GPLv2 or later
 License URI:        http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -144,6 +144,8 @@ Drop me a line at gridster@carsten-bach.de
 
 
 == Changelog ==
+= 1.4.1 =
+* Converted plugin file to use UNIX line endings
 
 = 1.4 =
 * Tested compatibility with WP 3.6 - everything fine ;)

@@ -15,7 +15,7 @@ You can get it also via the [WordPress Plugin Repository](http://wordpress.org/e
 
 **Tested up to:** 			3.6
 
-**Stable tag:** 				1.4
+**Stable tag:** 				1.4.1
 
 **License:**            GPLv2 or later
 
@@ -167,6 +167,8 @@ Drop me a line at gridster@carsten-bach.de
 
 
 ## Changelog ##
+### 1.4.1 ###
+* Converted plugin file to use UNIX line endings
 
 ### 1.4 ###
 * Tested compatibility with WP 3.6 - everything fine ;)
